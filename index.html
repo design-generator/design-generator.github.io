@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Design Generator</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+
+      body {
+        font-family: Monospace;
+        background-color: #f0f0f0;
+        margin: 0px;
+        overflow: hidden;
+        color: purple;
+      }
+
+      a {
+        color: red;
+      }
+
+      div#scale-maximum {
+        color: black;
+        text-align: center;
+        font-size: 1.2em;
+        position: fixed;
+        top: 60px;
+        left: 20px;
+        right: 0px;
+        width: 3%;
+      }
+
+      div#scale {
+        position: fixed;
+        top: 80px;
+        left: 20px;
+        width: 35px;
+        height: 300px;
+        background-image: -webkit-gradient(
+          linear,
+          right bottom,
+          right top,
+          color-stop(0, #0000FF),
+          color-stop(1, #FF0000)
+        );
+        background-image: -o-linear-gradient(top, #0000FF 0%, #FF0000 100%);
+        background-image: -moz-linear-gradient(top, #0000FF 0%, #FF0000 100%);
+        background-image: -webkit-linear-gradient(top, #0000FF 0%, #FF0000 100%);
+        background-image: -ms-linear-gradient(top, #0000FF 0%, #FF0000 100%);
+        background-image: linear-gradient(to top, #0000FF 0%, #FF0000 100%);
+      }
+
+      div#scale-minimum {
+        position: fixed;
+        top: 390px;
+        left: 20px;
+        color: black;
+        text-align: center;
+        font-size: 1.2em;
+        width: 3%;
+      }
+
+      div#cursor-temperature {
+        position: fixed;
+        top: 20px;
+        left: 100px;
+        color: black;
+        text-align: left;
+        font-size: 1.2em;
+        width: 30%;
+      }
+
+      div#occupant-position {
+        position: fixed;
+        top: 40px;
+        left: 100px;
+        color: black;
+        text-align: left;
+        font-size: 1.2em;
+        width: 30%;
+      }
+ 
+      div#generating {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        height: 100%;
+        opacity: 0.7;
+        text-align: center;
+        padding-top: 20%;
+        background-color: #ddd; 
+      }
+
+    </style>
+  </head>
+  <body>
+
+    <script type="text/javascript" src="js/libs/three.js/build/three.min.js"></script>
+    <script type="text/javascript" src="js/libs/three.js/src/extras/cameras/CombinedCamera.js"></script>
+    <script type="text/javascript" src="js/libs/three.js/examples/js/controls/OrbitControls.js"></script>
+    <script type="text/javascript" src="js/libs/three.js/examples/fonts/helvetiker_regular.typeface.js"></script>
+    <script type="text/javascript" src="js/libs/dat-gui/build/dat.gui.min.js"></script>
+    <script type="text/javascript" src="js/libs/underscore.min.js"></script>
+    <script type="text/javascript" src="js/util.js"></script>
+    
+    <div class="scale-label" id="scale-maximum"></div>
+    <div id="scale-container">
+      <div id="scale"></div>
+    </div>
+    <div class="scale-label" id="scale-minimum"></div>
+    <div class="scale-label" id="occupant-position"></div>
+    <div class="scale-label" id="cursor-temperature"></div>
+    <div id="generating" style="display: none;">generating ... </div>
+
+    <script type="text/javascript" src="js/main.js"></script>
+  </body>
+</html>
