@@ -352,17 +352,26 @@ function export2DE(){
 
         function pollinate(){
             // check if the sliders is checked
-            var inds = [];
+            var inds = []; // real indices of the sliders
+            var resInds = []; // indices to match results files
             var values = []; // list of list of values for each slider
             for (count = 0; count < sliders.length; count++){
                 var sl = sliders[count];
                 if (sl.min == sl.max){
                     values.push([sl.min]);
                     inds.push([0]);
+                    resInds.push([0]);
                 } else {
                     var v = range(sl.min, sl.max + sl.step, sl.step)
                     values.push(v);
                     inds.push(range(v.length));
+                    if (v.length == 2){
+                        resInds.push([0, 3]);
+                    } else if (v.length == 3) {
+                        resInds.push([0, 1, 3]);
+                    } else {
+                        resInds.push(range(v.length));
+                    }
                 }
             };
             // find all the combinations
@@ -389,7 +398,7 @@ function export2DE(){
     </script>
 
     <!-- Menu Toggle Script -->
-    <script>    
+    <script>
     $("#menu-toggle").click(function(e) {
         e.preventDefault();
         $("#wrapper").toggleClass("toggled");
