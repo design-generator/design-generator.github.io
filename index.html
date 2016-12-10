@@ -34,7 +34,12 @@
         <div id="sidebar-wrapper">
             <ul class="sidebar-nav">
                 <li class="sidebar-brand">
-                    <button type="button" class="btn btn-warning btn-l" id="generate"
+		    <div class="g-savetodrive"
+			 data-src="data.csv"
+			 data-filename="data.csv"
+			 data-sitename="design-explorer">
+		    </div>
+                    <button type="button" onclick="export2DE()" class="btn btn-warning btn-l" id="generate"
                         title="Generate combinations and visualize in Design Explorer">
                         Generate!
                     </button>
@@ -110,6 +115,82 @@
     <script src="js/libs/three.js/examples/js/controls/OrbitControls.js" charset="utf-8"></script> <!-- D3 -->
     <script src="js/libs/three.js/examples/js/libs/dat.gui.min.js" charset="utf-8"></script> <!-- D3 -->
 
+    <!-- google apis -->
+    <script src="https://apis.google.com/js/platform.js" async defer></script>		
+    <script type="text/javascript" src="https://apis.google.com/js/api.js"></script>
+	
+<script type="text/javascript">
+  var CLIENT_ID = '777571003919-h34o2bs5vrh7u8jq3fkvs7798fokmeif.apps.googleusercontent.com';
+  var APPID = "777571003919";
+  var SCOPES = ['https://www.googleapis.com/auth/drive'];
+  var OAUTHTOKEN;
+
+  // Called when the client library is loaded.
+  function handleClientLoad() {
+	checkAuth();
+  }
+
+  // Check if the current user has authorized the application.
+  function checkAuth() {
+	gapi.auth.authorize(
+		{'client_id': CLIENT_ID, 'scope': SCOPES, 'immediate': true},
+		handleAuthResult);
+  }
+
+  // Called when authorization server replies. @param {Object} authResult Authorization result.
+  function handleAuthResult(authResult) {
+	if (authResult) {
+	    OAUTHTOKEN = authResult.access_token;
+		console.log("OAUTHTOKEN loaded")
+	  // Access token has been successfully retrieved, requests can be sent to the API
+	} else {
+	  // No access token could be retrieved, force the authorization flow.
+	  gapi.auth.authorize(
+		  {'client_id': CLIENT_ID, 'scope': SCOPES, 'immediate': false},
+		  handleAuthResult);
+	}
+  }
+  gapi.load('picker', {'callback': onPickerApiLoad()});
+    function onPickerApiLoad() {
+      pickerApiLoaded = true;
+    }
+</script>
+<script type="text/javascript" src="https://apis.google.com/js/client.js?onload=handleClientLoad"></script>
+
+<script>
+function export2DE(){
+ 
+	 function createPicker() {
+	  if (OAUTHTOKEN) {
+		var view = new google.picker.DocsView(google.picker.ViewId.FOLDERS);
+		view.setMimeTypes("application/vnd.google-apps.folder");
+		view.setIncludeFolders(true);
+		view.setSelectFolderEnabled(true);
+		var picker = new google.picker.PickerBuilder()
+			//.enableFeature(google.picker.Feature.NAV_HIDDEN)
+			.setAppId(APPID)
+			.setOAuthToken(OAUTHTOKEN)
+			.addView(view)
+			//.addView(new google.picker.DocsUploadView())
+			.setCallback(pickerCallback)
+			.build();
+		 picker.setVisible(true);
+	  }
+	 }
+
+    // A simple callback implementation.
+	function pickerCallback(data) {
+	  if (data.action == google.picker.Action.PICKED) {
+		var folderId = data.docs[0].id;		
+		console.log('The user selected: ' + folderId);
+		var uri = "http://tt-acm.github.io/DesignExplorer/?GFOLDER=" + folderId;
+		window.open(uri);
+	  }
+	}
+	
+	createPicker();  
+};
+</script>
     <script>
     // constructor for settings
     	var Settings = function() {
