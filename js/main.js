@@ -22,19 +22,6 @@ $(function () {
 	var lines = [];
 	var windows = [];
 
-	// constructor for settings
-	var Settings = function() {
-	    this.Length = 25.35;
-	    this.Width = 25.35;
-	    this.Height = 5;
-	    this.Offset = 1.1;
-	    this.FloorCount = 1;
-	    this.WindowArea = 50;
-	  };
-
-	// gui
-	window.controls = new Settings();
-
 	var mult = controls.Offset * 2;
 	var offsetLength = controls.Length + mult;
 	var offsetWidth = controls.Width + mult;
@@ -46,8 +33,8 @@ $(function () {
 	function init() {
 
 		camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
-		camera.position.y = 50;
-		camera.position.z = -400;
+		camera.position.y = 10;
+		camera.position.x = 50;
 		scene = new THREE.Scene();
 		scene.background = new THREE.Color( 0xffffff );
 
@@ -165,13 +152,13 @@ $(function () {
 			scene.add(lines[i]);
 		}
 
-		createWindows();
-		createSlabs();
+		createWindows(controls);
+		createSlabs(controls);
 	}
 
-	window.updateBuilding = function updateBuilding()
+	window.updateBuilding = function updateBuilding(cnrt)
 	{
-		
+
 		//clear scene
 		for (var i = 0; i < scene.children.length; i++)
 		{
@@ -180,16 +167,16 @@ $(function () {
 		}
 
 		// floor vertices
-		coreVertices[0].set(-controls.Length * .5,	0, controls.Width * .5 );
-		coreVertices[1].set(controls.Length * .5, 	0, controls.Width * .5 );
-		coreVertices[2].set(controls.Length * .5, 	0, -controls.Width * .5 );
-		coreVertices[3].set(-controls.Length * .5,	0, -controls.Width * .5 );
+		coreVertices[0].set(-cnrt.Length * .5,	0, cnrt.Width * .5 );
+		coreVertices[1].set(cnrt.Length * .5, 	0, cnrt.Width * .5 );
+		coreVertices[2].set(cnrt.Length * .5, 	0, -cnrt.Width * .5 );
+		coreVertices[3].set(-cnrt.Length * .5,	0, -cnrt.Width * .5 );
 
 		// ceiling vertices
-		coreVertices[4].set(-controls.Length * .5,	controls.Height * controls.FloorCount,  controls.Width * .5 );
-		coreVertices[5].set(controls.Length * .5, 	controls.Height * controls.FloorCount,  controls.Width * .5 );
-		coreVertices[6].set(controls.Length * .5, 	controls.Height * controls.FloorCount,  -controls.Width * .5 );
-		coreVertices[7].set(-controls.Length * .5,	controls.Height * controls.FloorCount,  -controls.Width * .5 );
+		coreVertices[4].set(-cnrt.Length * .5,	cnrt.Height * cnrt.FloorCount,  cnrt.Width * .5 );
+		coreVertices[5].set(cnrt.Length * .5, 	cnrt.Height * cnrt.FloorCount,  cnrt.Width * .5 );
+		coreVertices[6].set(cnrt.Length * .5, 	cnrt.Height * cnrt.FloorCount,  -cnrt.Width * .5 );
+		coreVertices[7].set(-cnrt.Length * .5,	cnrt.Height * cnrt.FloorCount,  -cnrt.Width * .5 );
 
 		// offset floor vertices
 		frameVertices[0].set(-offsetLength * .5,	0, offsetWidth * .5 );
@@ -198,10 +185,10 @@ $(function () {
 		frameVertices[3].set(-offsetLength * .5,	0, -offsetWidth * .5 );
 
 		// offset ceiling vertices
-		frameVertices[4].set(-offsetLength * .5,	offsetHeight * controls.FloorCount,  offsetWidth * .5 );
-		frameVertices[5].set(offsetLength * .5, 	offsetHeight * controls.FloorCount,  offsetWidth * .5 );
-		frameVertices[6].set(offsetLength * .5, 	offsetHeight * controls.FloorCount,  -offsetWidth * .5 );
-		frameVertices[7].set(-offsetLength * .5,	offsetHeight * controls.FloorCount,  -offsetWidth * .5 );
+		frameVertices[4].set(-offsetLength * .5,	offsetHeight * cnrt.FloorCount,  offsetWidth * .5 );
+		frameVertices[5].set(offsetLength * .5, 	offsetHeight * cnrt.FloorCount,  offsetWidth * .5 );
+		frameVertices[6].set(offsetLength * .5, 	offsetHeight * cnrt.FloorCount,  -offsetWidth * .5 );
+		frameVertices[7].set(-offsetLength * .5,	offsetHeight * cnrt.FloorCount,  -offsetWidth * .5 );
 
 		coreGeom.vertices = coreVertices;
 		frameGeom.vertices = frameVertices;
@@ -222,15 +209,15 @@ $(function () {
 			scene.add(lines[i]);
 		}
 
-		createWindows();
-		createSlabs();
+		createWindows(cnrt);
+		createSlabs(cnrt);
 
 	}
 
-	function createWindows() {
-		if (controls.WindowArea > 0)
+	function createWindows(cnrt) {
+		if (cnrt.Window_Wall_Ratio > 0)
 		{
-			var windHeight = (controls.Height * (controls.WindowArea/100));
+			var windHeight = (cnrt.Height * (cnrt.Window_Wall_Ratio/100));
 
 			var windGeom = new THREE.Geometry();
 			var windVerts = [];
@@ -266,31 +253,31 @@ $(function () {
 
 			//var wind = new THREE.Mesh( windGeom, boxMaterial );
 
-			for (var i = 0; i < controls.FloorCount; i++)
+			for (var i = 0; i < cnrt.FloorCount; i++)
 			{
 				var wind = new THREE.Mesh( windGeom, boxMaterial );
-				wind.position.y += controls.Height/4;
-				wind.position.y += controls.Height * (i)
+				wind.position.y += cnrt.Height/4;
+				wind.position.y += cnrt.Height * (i)
 				scene.add(wind);
 			}
 
 		}
 	}
 
-	function createSlabs() {
-		var floorSpacing = controls.Height/controls.FloorCount;
+	function createSlabs(cnrt) {
+		var floorSpacing = cnrt.Height/cnrt.FloorCount;
 
-		if (controls.FloorCount > 1)
+		if (cnrt.FloorCount > 1)
 		{
 
-			for (var i = 0; i < controls.FloorCount; i++ )
+			for (var i = 0; i < cnrt.FloorCount; i++ )
 			{
 				if( i != 0)
 				{
 					var slab = new THREE.PlaneGeometry( offsetLength, offsetWidth, 2 );
 					var plane = new THREE.Mesh( slab, slabMaterial );
 					plane.rotation.x = 90 * Math.PI / 180;
-					plane.position.y +=  controls.Height *i;
+					plane.position.y +=  cnrt.Height *i;
 					scene.add( plane );
 				}
 			}
