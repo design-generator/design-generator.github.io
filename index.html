@@ -45,94 +45,34 @@
 		          </div>
 		          <div id="bldginfo-wrapper" class="panel-collapse collapse in">
 		            <div id="bldginfo-sliders" class="panel-body">
-                        <div class="col-xs-12" title="Change the area of the  building.">
-                            <label class="checkbox-inline">
-                                <input type="checkbox" value=""> Area
-                            </label>
-                            <input type="text" id="nArea" name="nArea" value="1250">
-                        </div>
-                        <div class="col-xs-12" title="Change the area of the  building.">
-                            <label class="checkbox-inline">
-                                <input type="checkbox" value=""> Width
-                            </label>
-                            <input type="text" id="nWidth" name="nWidth" value="100">
-                        </div>
-                        <div class="col-xs-12" title="Change the area of the  building.">
-                            <label class="checkbox-inline">
-                                <input type="checkbox" value=""> Length
-                            </label>
-                            <input type="text" id="nLength" name="nLength" value="50">
-						</div>
-                        <div class="col-xs-12" title="Change the area of the  building.">
-                            <label class="checkbox-inline">
-                                <input type="checkbox" value=""> Height
-                            </label>
-                            <input type="text" id="nHeight" name="nHeight" value="10">
-                        </div>
-                        <div class="col-xs-12" title="Change the area of the  building.">
-                            <label class="checkbox-inline">
-                                <input type="checkbox" value=""> Offset
-                            </label>
-                            <input type="text" id="nOffset" name="nOffset" value="5">
-                        </div>
-                        <div class="col-xs-12" title="Change the area of the  building.">
-                            <label class="checkbox-inline">
-                                <input type="checkbox" value=""> Floor Count
-                            </label>
-                            <input type="text" id="nFloorcount" name="nFloorcount" value="4">
-						</div>
-                        <a href="#">Aspect Ratio</a>
-                        <a href="#">Perimeter Depth (m)</a>
-                        <a href="#">Orientation</a>
-                        <a href="#">Floor to Floor height  (m)</a>
 		            </div>
 		          </div>
                   <div class="panel-heading clickable" data-toggle="collapse" data-parent="#accordion" href="#windowinfo-wrapper">
                     <h4 class="panel-title">Openings Parameters</h4>
                   </div>
                   <div id="windowinfo-wrapper" class="panel-collapse collapse">
-                    <div class="panel-body">
-                        <a href="#">Window Wall Ratio (%)</a>
-                        <a href="#">Window Height  (m)</a>
-                        <a href="#">Sill Height  (m)</a>
-                        <a href="#">Shading depth (m)</a>
+                    <div id="windowinfo-sliders" class="panel-body">
                     </div>
                   </div>
                   <div class="panel-heading clickable" data-toggle="collapse" data-parent="#accordion" href="#materialsinfo-wrapper">
                     <h4 class="panel-title">Material Parameters</h4>
                   </div>
                   <div id="materialsinfo-wrapper" class="panel-collapse collapse">
-                    <div class="panel-body">
-                        <a href="#">Infiltration</a>
-                        <a href="#">Wall R-value (M/K/W)</a>
-                        <a href="#">Roof R-value (M/K/W)</a>
-                        <a href="#">Glazing Type</a>
+                    <div id="materialsinfo-sliders" class="panel-body">
                     </div>
                   </div>
                   <div class="panel-heading clickable" data-toggle="collapse" data-parent="#accordion" href="#loadsinfo-wrapper">
                     <h4 class="panel-title">Loads & Set-points</h4>
                   </div>
                   <div id="loadsinfo-wrapper" class="panel-collapse collapse">
-                    <div class="panel-body">
-                        <a href="#">Outside air (Core) [CFM/ft²]</a>
-                        <a href="#">Outside air (Perimeter)</a>
-                        <a href="#">Internal Load (Core)[W/ft²]</a>
-                        <a href="#">Internal Load (Perimeter)[W/ft²]</a>
-                        <a href="#">Comfort Range</a>
+                    <div id="loadsinfo-sliders" class="panel-body">
                     </div>
                   </div>
                   <div class="panel-heading clickable" data-toggle="collapse" data-parent="#accordion" href="#systemsinfo-wrapper">
                     <h4 class="panel-title">HVAC System</h4>
                   </div>
                   <div id="systemsinfo-wrapper" class="panel-collapse collapse">
-                    <div class="panel-body">
-                        <select class="form-control" id="sel1">
-                          <option>VAV + Reheat</option>
-                          <option>Chilled Beam</option>
-                          <option>VRF + DOAS</option>
-                          <option>Radiant + DOAS</option>
-                          <option>Heat Pump</option>
-                        </select>
+                    <div id="systemsinfo-sliders" class="panel-body">
                     </div>
                   </div>
                 </div>
@@ -181,33 +121,64 @@
     <script>
         var sliders = [
             {"divid": "bldginfo-sliders", "name": "Area", "min": 1250, "max": 5000, "from": 1250, "step": 3750, "postfix": " m2"},
-            {"divid": "bldginfo-sliders", "name": "Width", "min": 0, "max": 200, "from": 1250, "step": 50, "postfix": " m"},
-            {"divid": "bldginfo-sliders", "name": "Height", "min": 0, "max": 200, "from": 1250, "step": 10, "postfix": " m"},
-            {"divid": "bldginfo-sliders", "name": "Length", "min": 0, "max": 200, "from": 1250, "step": 10, "postfix": " m"},
-            {"divid": "bldginfo-sliders", "name": "Offset", "min": 1, "max": 3, "from": 2, "step": 1, "postfix": " m"},
-            {"divid": "bldginfo-sliders", "name": "Floorcount", "min": 0, "max": 4, "from": 2, "step": 1, "postfix": " m"}
-
+            {"divid": "bldginfo-sliders", "name": "Aspect_Ratio", "min": 1, "max": 1.5, "from": 1, "step": .5},
+            {"divid": "bldginfo-sliders", "name": "Height", "min": 4, "max": 4, "from": 4, "step": 4, "postfix": " m", "disable": true},
+            {"divid": "bldginfo-sliders", "name": "Offset", "min": 4, "max": 4, "from": 4, "step": 0, "postfix": " m", "disable": true},
+            {"divid": "bldginfo-sliders", "name": "FloorCount", "min": 1, "max": 4, "from": 1, "step": 4},
+            {"divid": "bldginfo-sliders", "name": "Orientation", "min": 0, "max": 0, "from": 0, "step": 0, "postfix": " deg", "disable": true},
+            {"divid": "windowinfo-sliders", "name": "Window_Wall_Ratio", "min": 30, "max": 50, "from": 30, "step": 20, "postfix": "%"},
+            {"divid": "windowinfo-sliders", "name": "Window_Height", "min": 2, "max": 2, "from": 2, "step": 0, "postfix": "m", "disable": true},
+            {"divid": "windowinfo-sliders", "name": "Sill_Height", "min": 0.7, "max": 0.7, "from": 0.7, "step": 0, "postfix": "m", "disable": true},
+            {"divid": "windowinfo-sliders", "name": "Shading_depth", "min": 0, "max": 1, "from": 1, "step": 1, "postfix": "m", "disable": true},
+            {"divid": "materialsinfo-sliders", "name": "Infiltration", "min": 0.0001, "max": 0.0003, "from": 0.0001, "step": 0.0001, "disable": false},
+            {"divid": "materialsinfo-sliders", "name": "R_value_Wall", "min": 2.6, "max": 7, "from": 2.6, "step": 4.4, "postfix": "m2/k/W"},
+            {"divid": "materialsinfo-sliders", "name": "R_value_Roof", "min": 3.5, "max": 7, "from": 3.5, "step": 3.5},
+            {"divid": "materialsinfo-sliders", "name": "Glazing_Type", "min": 0, "max": 1, "from": 0, "step": 1},
+            {"divid": "loadsinfo-sliders", "name": "Outside_Air_Core", "min": 0.06, "max": 0.06, "from": 0.06, "step": 0, "postfix": "m", "disable": true},
+            {"divid": "loadsinfo-sliders", "name": "Outside_Air_Perimeter", "min": 0.06, "max": 0.3, "from": 0.06, "step": 0.24, "postfix": "m"},
+            {"divid": "loadsinfo-sliders", "name": "Internal_Load_Core", "min": 1, "max": 1, "from": 1, "step": 1, "postfix": "m", "disable": true},
+            {"divid": "loadsinfo-sliders", "name": "Internal_Load_Perimeter", "min": 1, "max": 1, "from": 1, "step": 0, "postfix": "m", "disable": true},
+            {"divid": "loadsinfo-sliders", "name": "Comfort_Range", "min": 0.06, "max": 0.06, "from": 0.06, "step": 0, "postfix": "m", "disable": true},
+            {"divid": "systemsinfo-sliders", "name": "HVAC_Systems", "min": 0, "max": 3, "from": 0, "step": 1,
+             "prettify": function (num) {
+                 var systems = ["VAV + Reheat", "Chilled Beam", "VRF + DOAS", "Radiant + DOAS", "Heat Pump"];
+                 return systems[num];}
+             }
         ]
 
-        // generate sliders
+        controls = {};
 
-        // <div class="col-xs-12" title="Change the area of the  building.">
-        //     <label class="checkbox-inline">
-        //         <input type="checkbox" value=""> Area
-        //     </label>
-        //     <input type="text" id="nArea" name="nArea" value="1250">
-        // </div>
-        //
-        // update slider values
+        // generate sliders
         for(count = 0; count < sliders.length; count++){
             var sl = sliders[count]
-            d3.select("#" + sl.name)
+            var cont = d3.select("#" + sl.divid)
+                        .append("div")
+                        .attr("class", "col-xs-12")
+                        .attr("title", "Update " + sl.name  + " value!");
 
+            cont.text(sl.name);
+
+            cont.append("label")
+                .append("input")
+                    .attr("type", "checkbox")
+                    .attr("value", "");
+
+
+            cont.append("input")
+                .attr("type", "text")
+                .attr("id", "n" + sl.name)
+                .attr("name", "n" + sl.name)
+                .attr("value", sl.from);
+
+            var sl = sliders[count]
             $("#n" + sl.name).ionRangeSlider({
                 hide_min_max: true, min: sl.min, max: sl.max, from: sl.from, step: sl.step,
-                postfix:sl.postfix, grid: false, prettify_separator: ",",
+                postfix:sl.postfix, grid: false, prettify_separator: ",", disable: sl.disable,
+                prettify: sl.prettify,
                 onFinish: function(data) {update(data.input[0].name, data.from);}
             });
+
+            controls[name.slice(1)] = sl.from;
         }
 
         function updateSliderValue(sliderName, sliderValue){
@@ -219,9 +190,18 @@
         function update(name, value){
             console.log('updating!');
             // update slider value
+            // this part of the code should move to main.js
+            if (name == 'nArea' || name == 'Aspect_Ratio'){
+                width = Math.sqrt(controls['Area'] / controls['Aspect_Ratio']);
+
+                controls['Width'] = width;
+                controls['Length'] = controls['Area'] / width;
+
+            }
             controls[name.slice(1)] = value
             // update geometry
             updateBuilding()
+
             // update d3 graph
 
             // parse the results
