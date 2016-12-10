@@ -91,7 +91,9 @@
                         </button>
                     </div>
                     <div class="col-lg-10" id="viewer3d"></div>
-                    <div class="col-lg-2" id="charts"></div>
+                    <div class="col-lg-2" id="charts">
+                        <a href="javascript:save()">Create PNG</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -299,13 +301,14 @@
                     // capture image
 
                     // read the results and add them to csv
+
                 }
             }
         }
     </script>
 
     <!-- Menu Toggle Script -->
-    <script>
+    <script>    
     $("#menu-toggle").click(function(e) {
         e.preventDefault();
         $("#wrapper").toggleClass("toggled");

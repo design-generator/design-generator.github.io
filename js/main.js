@@ -63,6 +63,8 @@ $(function () {
 		renderer.setSize( window.innerWidth, window.innerHeight );
 
 		container = document.getElementById("viewer3d")
+		var texture = new THREE.Texture(container);
+		texture.needsUpdate = true;
 		container.appendChild( renderer.domElement );
 
 		window.addEventListener( 'resize', onWindowResize, false );
@@ -309,4 +311,8 @@ $(function () {
 		renderer.setSize( window.innerWidth, window.innerHeight );
 	}
 
+	window.save = function save(){
+		window.open(renderer.domElement.toDataURL('img/png'), 'mywindow');
+		return false;
+	}
 });
