@@ -188,7 +188,6 @@
 
     <script>
         function update(name, value){
-            console.log('updating!');
             // update slider value
             // this part of the code should move to main.js
             if (name == 'nArea' || name == 'Aspect_Ratio'){
@@ -207,7 +206,85 @@
             // parse the results
         }
     </script>
+    <script>
+        //pollinator!
+        function cartesian() {
+            var r = [], arg = arguments, max = arg.length-1;
+            function helper(arr, i) {
+                for (var j=0, l=arg[i].length; j<l; j++) {
+                    var a = arr.slice(0); // clone arr
+                    a.push(arg[i][j]);
+                    if (i==max)
+                        r.push(a);
+                    else
+                        helper(a, i+1);
+                }
+            }
+            helper([], 0);
+            return r;
+        }
 
+        function range(start, stop, step) {
+            if (typeof stop == 'undefined') {
+                // one param defined
+                stop = start;
+                start = 0;
+            }
+
+            if (typeof step == 'undefined') {
+                step = 1;
+            }
+
+            if ((step > 0 && start >= stop) || (step < 0 && start <= stop)) {
+                return [];
+            }
+
+            var result = [];
+            for (var i = start; step > 0 ? i < stop : i > stop; i += step) {
+                result.push(i);
+            }
+
+            return result;
+        };
+
+        function pollinate(){
+            // check if the sliders is checked
+            var inds = [];
+            var values = []; // list of list of values for each slider
+            for (count = 0; count < sliders.length; count++){
+                var sl = sliders[count];
+                if (sl.min == sl.max){
+                    values.push([sl.min]);
+                    inds.push([0]);
+                } else {
+                    var v = range(sl.min, sl.max + sl.step, sl.step)
+                    values.push(v);
+                    inds.push(range(v.length));
+                }
+            };
+            // find all the combinations
+            combs = cartesian.apply(this, inds);
+
+            // for each combination in combinations set the sliders
+            // read the values and capture the image
+            // for (count = 0; count < combs.length; count++){
+            for (count = 0; count < 200; count++){
+                var comb = combs[count];
+                for (c = 0; c < comb.length; c++){
+                    var sl = sliders[c];
+                    var v = values[c][comb[c]];
+                    updateSliderValue("n" + sl.name, v);
+                    // update geometry
+                    update("n" + sl.name, v);
+                    // update d3 graphic
+                    console.log(sl.name + ":" + v);
+                    // capture image
+
+                    // read the results and add them to csv
+                }
+            }
+        }
+    </script>
     <!-- Menu Toggle Script -->
     <script>
     $("#menu-toggle").click(function(e) {
