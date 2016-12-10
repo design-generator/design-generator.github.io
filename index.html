@@ -86,12 +86,12 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-lg-12">
-                        <button type="button" class="btn btn-default btn-xs" id="menu-toggle" title="Show sliders">
+                        <button type="button" class="btn btn-warning btn-xs" id="menu-toggle" title="Show sliders">
                             <span class="glyphicon glyphicon-menu-hamburger"></span>
                         </button>
                     </div>
-                    <div class="col-lg-12" id="viewer3d">
-                    </div>
+                    <div class="col-lg-10" id="viewer3d"></div>
+                    <div class="col-lg-2" id="charts"></div>
                 </div>
             </div>
         </div>
@@ -201,13 +201,19 @@
             // update geometry
             updateBuilding()
 
-            // update d3 graph
-
             // parse the results
+
+            // update d3 graph
+            d3.select('#charts')
+                .transition()
+                .delay(2)
+                .text(name + ':' + value);
         }
     </script>
     <script>
         //pollinator!
+        d3.select('button#generate').on('click', pollinate);
+
         function cartesian() {
             var r = [], arg = arguments, max = arg.length-1;
             function helper(arr, i) {
@@ -268,7 +274,7 @@
             // for each combination in combinations set the sliders
             // read the values and capture the image
             // for (count = 0; count < combs.length; count++){
-            for (count = 0; count < 200; count++){
+            for (count = 0; count < 10; count++){
                 var comb = combs[count];
                 for (c = 0; c < comb.length; c++){
                     var sl = sliders[c];
@@ -276,8 +282,6 @@
                     updateSliderValue("n" + sl.name, v);
                     // update geometry
                     update("n" + sl.name, v);
-                    // update d3 graphic
-                    console.log(sl.name + ":" + v);
                     // capture image
 
                     // read the results and add them to csv
@@ -285,6 +289,7 @@
             }
         }
     </script>
+
     <!-- Menu Toggle Script -->
     <script>
     $("#menu-toggle").click(function(e) {
