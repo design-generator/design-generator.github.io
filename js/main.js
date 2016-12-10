@@ -7,7 +7,7 @@ $(function () {
 	var boxMaterial;
 	var lineMaterial;
 	var slabMaterial
-	var frameColor = 0xffffff;
+	var frameColor = 0x000000;
 
 	// inner core
 	var core;
@@ -30,12 +30,6 @@ $(function () {
 
 	// gui
 	window.controls = new Settings();
-	// var gui = new dat.GUI();
-	// gui.add(controls, 'Length', 100, 300);
-	// gui.add(controls, 'Width', 100, 300);
-	// gui.add(controls, 'Height', 100, 300);
-	// gui.add(controls, 'Offset', 1, 2);
-	// gui.add(controls, 'FloorCount').min(1).max(10).step(1);
 
 	init();
 	animate();
@@ -43,16 +37,14 @@ $(function () {
 	function init() {
 
 		camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
-		//camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 1000 );
 		camera.position.y = 50;
-		camera.position.z = -200;
+		camera.position.z = -400;
 		scene = new THREE.Scene();
+		scene.background = new THREE.Color( 0xffffff );
 
 		// define materials
 		boxMaterial = new THREE.MeshBasicMaterial( {
-			color: 0xffffff,
-			transparent: true,
-			opacity: 0
+			color: 0x000000,
 		} );
 
 		lineMaterial = new THREE.LineBasicMaterial({
@@ -97,9 +89,9 @@ $(function () {
 		coreVertices[7] = new THREE.Vector3( -controls.Length * .5,	controls.Height,  -controls.Width * .5 );
 
 		// multplier for building frame offset
-		var mult = controls.Offset;
-		var offsetLength = controls.Length * mult;
-		var offsetWidth = controls.Width * mult;
+		var mult = controls.Offset * 2;
+		var offsetLength = controls.Length + mult;
+		var offsetWidth = controls.Width + mult;
 		var offsetHeight = controls.Height;
 
 		// offset floor vertices
@@ -148,13 +140,6 @@ $(function () {
 		frameGeom.faces[10] = new THREE.Face3( 7, 6, 5 );
 		frameGeom.faces[11] = new THREE.Face3( 7, 5, 4 );
 
-		//clear scene
-		for (var i = 0; i < scene.children.length; i++)
-		{
-			var obj = scene.children[ i ];
-			scene.remove(obj)
-		}
-
 		core = new THREE.Mesh( coreGeom, boxMaterial );
 		frame = new THREE.Mesh ( frameGeom, boxMaterial);
 
@@ -163,10 +148,6 @@ $(function () {
 		scene.add(frameHelper);
 		coreHelper.update(core);
 		frameHelper.update(frame);
-
-		// add geometry to scene
-		scene.add(core);
-		scene.add(frame);
 
 		// draw lines between corner points
 		for (var i = 0; i < frame.geometry.vertices.length; i++)
@@ -184,6 +165,7 @@ $(function () {
 
 	window.updateBuilding = function updateBuilding()
 	{
+		
 		// floor vertices
 		coreVertices[0].set(-controls.Length * .5,	0, controls.Width * .5 );
 		coreVertices[1].set(controls.Length * .5, 	0, controls.Width * .5 );
@@ -197,9 +179,9 @@ $(function () {
 		coreVertices[7].set(-controls.Length * .5,	controls.Height,  -controls.Width * .5 );
 
 		// multplier for building frame offset
-		var mult = controls.Offset;
-		var offsetLength = controls.Length * mult;
-		var offsetWidth = controls.Width * mult;
+		var mult = controls.Offset * 2;
+		var offsetLength = controls.Length + mult;
+		var offsetWidth = controls.Width + mult;
 		var offsetHeight = controls.Height;
 
 		// offset floor vertices
@@ -214,6 +196,9 @@ $(function () {
 		frameVertices[6].set(offsetLength * .5, 	offsetHeight,  -offsetWidth * .5 );
 		frameVertices[7].set(-offsetLength * .5,	offsetHeight,  -offsetWidth * .5 );
 
+		console.log(coreVertices[0]);
+		console.log(frameVertices[0]);
+
 		coreGeom.vertices = coreVertices;
 		frameGeom.vertices = frameVertices;
 
@@ -223,10 +208,6 @@ $(function () {
 			var obj = scene.children[ i ];
 			scene.remove(obj)
 		}
-
-		// add geometry to scene
-		scene.add(core);
-		scene.add(frame);
 
 		// create geometry frames
 		scene.add(coreHelper);
