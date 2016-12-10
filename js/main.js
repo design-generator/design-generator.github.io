@@ -1,5 +1,5 @@
 // put all the main functionalities here!
-function(){
+$(function () {
 	var camera, scene, renderer;
 	var control;
 
@@ -29,13 +29,13 @@ function(){
 	  };
 
 	// gui
-	var controls = new Settings();
-	var gui = new dat.GUI();
-	gui.add(controls, 'Length', 100, 300);
-	gui.add(controls, 'Width', 100, 300);
-	gui.add(controls, 'Height', 100, 300);
-	gui.add(controls, 'Offset', 1, 2);
-	gui.add(controls, 'FloorCount').min(1).max(10).step(1);
+	window.controls = new Settings();
+	// var gui = new dat.GUI();
+	// gui.add(controls, 'Length', 100, 300);
+	// gui.add(controls, 'Width', 100, 300);
+	// gui.add(controls, 'Height', 100, 300);
+	// gui.add(controls, 'Offset', 1, 2);
+	// gui.add(controls, 'FloorCount').min(1).max(10).step(1);
 
 	init();
 	animate();
@@ -47,10 +47,10 @@ function(){
 		camera.position.y = 50;
 		camera.position.z = -200;
 		scene = new THREE.Scene();
-		
+
 		// define materials
-		boxMaterial = new THREE.MeshBasicMaterial( { 
-			color: 0xffffff, 
+		boxMaterial = new THREE.MeshBasicMaterial( {
+			color: 0xffffff,
 			transparent: true,
 			opacity: 0
 		} );
@@ -60,7 +60,7 @@ function(){
         });
 
         slabMaterial = new THREE.MeshBasicMaterial( {
-        	color: 0xff0000, 
+        	color: 0xff0000,
         	side: THREE.DoubleSide
         } );
 
@@ -70,12 +70,14 @@ function(){
 		renderer = new THREE.WebGLRenderer();
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( window.innerWidth, window.innerHeight );
-		document.body.appendChild( renderer.domElement );
+
+		container = document.getElementById("viewer3d")
+		container.appendChild( renderer.domElement );
 
 		window.addEventListener( 'resize', onWindowResize, false );
-		
+
 		// add mouse controls
-		control = new THREE.OrbitControls( camera );
+		control = new THREE.OrbitControls( camera, container );
 	}
 
 	function createBuilding() {
@@ -86,9 +88,9 @@ function(){
 		coreVertices[0] = new THREE.Vector3( -controls.Length * .5,	0, controls.Width * .5 );
 		coreVertices[1] = new THREE.Vector3( controls.Length * .5, 	0, controls.Width * .5 );
 		coreVertices[2] = new THREE.Vector3( controls.Length * .5, 	0, -controls.Width * .5 );
-		coreVertices[3] = new THREE.Vector3( -controls.Length * .5,	0, -controls.Width * .5 );	
-		
-		// ceiling vertices 
+		coreVertices[3] = new THREE.Vector3( -controls.Length * .5,	0, -controls.Width * .5 );
+
+		// ceiling vertices
 		coreVertices[4] = new THREE.Vector3( -controls.Length * .5,	controls.Height,  controls.Width * .5 );
 		coreVertices[5] = new THREE.Vector3( controls.Length * .5, 	controls.Height,  controls.Width * .5 );
 		coreVertices[6] = new THREE.Vector3( controls.Length * .5, 	controls.Height,  -controls.Width * .5 );
@@ -104,9 +106,9 @@ function(){
 		frameVertices[0] = new THREE.Vector3( -offsetLength * .5,	0, offsetWidth * .5 );
 		frameVertices[1] = new THREE.Vector3( offsetLength * .5, 	0, offsetWidth * .5 );
 		frameVertices[2] = new THREE.Vector3( offsetLength * .5, 	0, -offsetWidth * .5 );
-		frameVertices[3] = new THREE.Vector3( -offsetLength * .5,	0, -offsetWidth * .5 );	
-		
-		// offset ceiling vertices 
+		frameVertices[3] = new THREE.Vector3( -offsetLength * .5,	0, -offsetWidth * .5 );
+
+		// offset ceiling vertices
 		frameVertices[4] = new THREE.Vector3( -offsetLength * .5,	offsetHeight,  offsetWidth * .5 );
 		frameVertices[5] = new THREE.Vector3( offsetLength * .5, 	offsetHeight,  offsetWidth * .5 );
 		frameVertices[6] = new THREE.Vector3( offsetLength * .5, 	offsetHeight,  -offsetWidth * .5 );
@@ -180,15 +182,15 @@ function(){
 		createSlabs();
 	}
 
-	function updateBuilding()
+	window.updateBuilding = function updateBuilding()
 	{
 		// floor vertices
 		coreVertices[0].set(-controls.Length * .5,	0, controls.Width * .5 );
 		coreVertices[1].set(controls.Length * .5, 	0, controls.Width * .5 );
 		coreVertices[2].set(controls.Length * .5, 	0, -controls.Width * .5 );
-		coreVertices[3].set(-controls.Length * .5,	0, -controls.Width * .5 );	
-		
-		// ceiling vertices 
+		coreVertices[3].set(-controls.Length * .5,	0, -controls.Width * .5 );
+
+		// ceiling vertices
 		coreVertices[4].set(-controls.Length * .5,	controls.Height,  controls.Width * .5 );
 		coreVertices[5].set(controls.Length * .5, 	controls.Height,  controls.Width * .5 );
 		coreVertices[6].set(controls.Length * .5, 	controls.Height,  -controls.Width * .5 );
@@ -204,9 +206,9 @@ function(){
 		frameVertices[0].set(-offsetLength * .5,	0, offsetWidth * .5 );
 		frameVertices[1].set(offsetLength * .5, 	0, offsetWidth * .5 );
 		frameVertices[2].set(offsetLength * .5, 	0, -offsetWidth * .5 );
-		frameVertices[3].set(-offsetLength * .5,	0, -offsetWidth * .5 );	
-		
-		// offset ceiling vertices 
+		frameVertices[3].set(-offsetLength * .5,	0, -offsetWidth * .5 );
+
+		// offset ceiling vertices
 		frameVertices[4].set(-offsetLength * .5,	offsetHeight,  offsetWidth * .5 );
 		frameVertices[5].set(offsetLength * .5, 	offsetHeight,  offsetWidth * .5 );
 		frameVertices[6].set(offsetLength * .5, 	offsetHeight,  -offsetWidth * .5 );
@@ -260,8 +262,8 @@ function(){
 					plane.rotation.x = 90 * Math.PI / 180;
 					plane.position.y += floorSpacing*i;
 					scene.add( plane );
-				}	
-				
+				}
+
 				else
 				{
 					var slab = new THREE.PlaneGeometry( controls.Length, controls.Width, 2 );
@@ -280,7 +282,7 @@ function(){
 
 	function render() {
 
-		updateBuilding();
+		// updateBuilding();
 		renderer.render( scene, camera );
 	}
 
@@ -289,4 +291,5 @@ function(){
 		camera.updateProjectionMatrix();
 		renderer.setSize( window.innerWidth, window.innerHeight );
 	}
-}
+
+});

@@ -150,6 +150,8 @@
                             <span class="glyphicon glyphicon-menu-hamburger"></span>
                         </button>
                     </div>
+                    <div class="col-lg-12" id="viewer3d">
+                    </div>
                 </div>
             </div>
         </div>
@@ -161,6 +163,13 @@
 
     <!-- jQuery -->
     <script src="js/libs/jquery.js"></script>
+
+    <script src="js/libs/three.js/build/three.js" charset="utf-8"></script> <!-- D3 -->
+    <script src="js/libs/three.js/examples/js/controls/OrbitControls.js" charset="utf-8"></script> <!-- D3 -->
+    <script src="js/libs/three.js/examples/js/libs/dat.gui.min.js" charset="utf-8"></script> <!-- D3 -->
+
+
+    <script src="js/main.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
     <script src="js/libs/bootstrap.min.js"></script>
@@ -210,9 +219,9 @@
         function update(name, value){
             console.log('updating!');
             // update slider value
-
+            controls[name.slice(1)] = value
             // update geometry
-
+            updateBuilding()
             // update d3 graph
 
             // parse the results
