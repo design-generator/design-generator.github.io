@@ -39,7 +39,8 @@
 			 data-filename="data.csv"
 			 data-sitename="design-explorer">
 		    </div>
-                    <button type="button" onclick="export2DE()" class="btn btn-warning btn-l" id="generate"
+                    <button onclick="export2DE()"></button>
+                    <button type="button" class="btn btn-warning btn-l" id="generate"
                         title="Generate combinations and visualize in Design Explorer">
                         Generate!
                     </button>
@@ -96,9 +97,10 @@
                         </button>
                     </div>
                     <div class="col-lg-10" id="viewer3d"></div>
-                    <div class="col-lg-2" id="charts">
+                    <div class="col-lg-2" id="png">
                         <a href="javascript:save()">Create PNG</a>
                     </div>
+                    <div class="col-lg-2" id="charts"></div>
                 </div>
             </div>
         </div>
@@ -116,9 +118,9 @@
     <script src="js/libs/three.js/examples/js/libs/dat.gui.min.js" charset="utf-8"></script> <!-- D3 -->
 
     <!-- google apis -->
-    <script src="https://apis.google.com/js/platform.js" async defer></script>		
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
     <script type="text/javascript" src="https://apis.google.com/js/api.js"></script>
-	
+
 <script type="text/javascript">
   var CLIENT_ID = '777571003919-h34o2bs5vrh7u8jq3fkvs7798fokmeif.apps.googleusercontent.com';
   var APPID = "777571003919";
@@ -159,7 +161,7 @@
 
 <script>
 function export2DE(){
- 
+
 	 function createPicker() {
 	  if (OAUTHTOKEN) {
 		var view = new google.picker.DocsView(google.picker.ViewId.FOLDERS);
@@ -181,14 +183,14 @@ function export2DE(){
     // A simple callback implementation.
 	function pickerCallback(data) {
 	  if (data.action == google.picker.Action.PICKED) {
-		var folderId = data.docs[0].id;		
+		var folderId = data.docs[0].id;
 		console.log('The user selected: ' + folderId);
 		var uri = "http://tt-acm.github.io/DesignExplorer/?GFOLDER=" + folderId;
 		window.open(uri);
 	  }
 	}
-	
-	createPicker();  
+
+	createPicker();
 };
 </script>
     <script>
@@ -215,6 +217,8 @@ function export2DE(){
     <link rel="stylesheet" href="js/libs/rangeslider/css/ion.rangeSlider.css" />
     <link rel="stylesheet" href="js/libs/rangeslider/css/ion.rangeSlider.skinNice.css"/>
     <script>
+        var inputValues = {};
+        var outputValues = {};
         var sliders = [
             {"divid": "bldginfo-sliders", "name": "Area", "min": 1250, "max": 5000, "from": 1250, "step": 3750, "postfix": " m2"},
             {"divid": "bldginfo-sliders", "name": "Aspect_Ratio", "min": 1, "max": 1.5, "from": 1, "step": .5},
@@ -242,9 +246,11 @@ function export2DE(){
              }
         ]
 
+
         // generate sliders
         for(count = 0; count < sliders.length; count++){
-            var sl = sliders[count]
+            var sl = sliders[count];
+            inputValues[sl.name] = sl.from;  // set up initial values
             var cont = d3.select("#" + sl.divid)
                         .append("div")
                         .attr("class", "col-xs-12")
@@ -276,6 +282,7 @@ function export2DE(){
         }
 
         function updateSliderValue(sliderName, sliderValue){
+            inputValues[sliderName] = sliderValue;
             $("#" + sliderName).data("ionRangeSlider").update({ from: sliderValue});
         }
     </script>
@@ -284,6 +291,8 @@ function export2DE(){
         function update(name, value){
             // update slider value
             // this part of the code should move to main.js
+            inputValues[name] = value;
+
             if (name == 'nArea' || name == 'nAspect_Ratio'){
                 width = Math.sqrt(controls['Area'] / controls['Aspect_Ratio']);
 
@@ -299,12 +308,28 @@ function export2DE(){
                 updateBuilding(controls);
             }
             // parse the results
-
+            var res = {
+                "Heating": Math.floor(Math.random() * 10000),
+                "Cooling": Math.floor(Math.random() * 90000),
+                "Lighting": Math.floor(Math.random() * 20000),
+                "Well Daylit": Math.floor(Math.random() * 40)
+            }
             // update d3 graph
             d3.select('#charts')
-                .transition()
-                .delay(2)
-                .text(name + ':' + value);
+                .selectAll('text')
+                .remove()
+
+            d3.select('#charts')
+                .selectAll('text')
+                .data(d3.keys(res))
+                .enter()
+                .append('text')
+                .text(function(d){
+                   return d + ": " + res[d] + "\n";
+                })
+                .attr("y", function(d,i){
+                   return i * -12;
+                });
         }
     </script>
     <script>
