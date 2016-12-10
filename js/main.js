@@ -19,17 +19,26 @@ $(function () {
 	var frameHelper = new THREE.BoxHelper(frame, frameColor);
 	var frameVertices = [];
 
+	var lines = [];
+	var windows = [];
+
 	// constructor for settings
 	var Settings = function() {
-	    this.Length = 200;
-	    this.Width = 200;
-	    this.Height = 200;
+	    this.Length = 25.35;
+	    this.Width = 25.35;
+	    this.Height = 5;
 	    this.Offset = 1.1;
-	    this.FloorCount = 3;
+	    this.FloorCount = 10;
+	    this.WindowArea = 50;
 	  };
 
 	// gui
 	window.controls = new Settings();
+
+	var mult = controls.Offset * 2;
+	var offsetLength = controls.Length + mult;
+	var offsetWidth = controls.Width + mult;
+	var offsetHeight = controls.Height;
 
 	init();
 	animate();
@@ -44,7 +53,10 @@ $(function () {
 
 		// define materials
 		boxMaterial = new THREE.MeshBasicMaterial( {
-			color: 0x000000,
+			color: 0x0000ff,
+			side: THREE.DoubleSide,
+			transparent: true,
+			opacity: .3
 		} );
 
 		lineMaterial = new THREE.LineBasicMaterial({
@@ -83,16 +95,10 @@ $(function () {
 		coreVertices[3] = new THREE.Vector3( -controls.Length * .5,	0, -controls.Width * .5 );
 
 		// ceiling vertices
-		coreVertices[4] = new THREE.Vector3( -controls.Length * .5,	controls.Height,  controls.Width * .5 );
-		coreVertices[5] = new THREE.Vector3( controls.Length * .5, 	controls.Height,  controls.Width * .5 );
-		coreVertices[6] = new THREE.Vector3( controls.Length * .5, 	controls.Height,  -controls.Width * .5 );
-		coreVertices[7] = new THREE.Vector3( -controls.Length * .5,	controls.Height,  -controls.Width * .5 );
-
-		// multplier for building frame offset
-		var mult = controls.Offset * 2;
-		var offsetLength = controls.Length + mult;
-		var offsetWidth = controls.Width + mult;
-		var offsetHeight = controls.Height;
+		coreVertices[4] = new THREE.Vector3( -controls.Length * .5,	controls.Height * controls.FloorCount,  controls.Width * .5 );
+		coreVertices[5] = new THREE.Vector3( controls.Length * .5, 	controls.Height * controls.FloorCount,  controls.Width * .5 );
+		coreVertices[6] = new THREE.Vector3( controls.Length * .5, 	controls.Height * controls.FloorCount,  -controls.Width * .5 );
+		coreVertices[7] = new THREE.Vector3( -controls.Length * .5,	controls.Height * controls.FloorCount,  -controls.Width * .5 );
 
 		// offset floor vertices
 		frameVertices[0] = new THREE.Vector3( -offsetLength * .5,	0, offsetWidth * .5 );
@@ -101,10 +107,10 @@ $(function () {
 		frameVertices[3] = new THREE.Vector3( -offsetLength * .5,	0, -offsetWidth * .5 );
 
 		// offset ceiling vertices
-		frameVertices[4] = new THREE.Vector3( -offsetLength * .5,	offsetHeight,  offsetWidth * .5 );
-		frameVertices[5] = new THREE.Vector3( offsetLength * .5, 	offsetHeight,  offsetWidth * .5 );
-		frameVertices[6] = new THREE.Vector3( offsetLength * .5, 	offsetHeight,  -offsetWidth * .5 );
-		frameVertices[7] = new THREE.Vector3( -offsetLength * .5,	offsetHeight,  -offsetWidth * .5 );
+		frameVertices[4] = new THREE.Vector3( -offsetLength * .5,	offsetHeight * controls.FloorCount,  offsetWidth * .5 );
+		frameVertices[5] = new THREE.Vector3( offsetLength * .5, 	offsetHeight * controls.FloorCount,  offsetWidth * .5 );
+		frameVertices[6] = new THREE.Vector3( offsetLength * .5, 	offsetHeight * controls.FloorCount,  -offsetWidth * .5 );
+		frameVertices[7] = new THREE.Vector3( -offsetLength * .5,	offsetHeight * controls.FloorCount,  -offsetWidth * .5 );
 
 		coreGeom.vertices = coreVertices;
 		frameGeom.vertices = frameVertices;
@@ -152,20 +158,27 @@ $(function () {
 		// draw lines between corner points
 		for (var i = 0; i < frame.geometry.vertices.length; i++)
 		{
-			var lines = new THREE.Geometry();
-			lines.vertices.push(coreVertices[i]);
-			lines.vertices.push(frameVertices[i]);
-			var line = new THREE.Line(lines, lineMaterial);
-			scene.add(line);
-
+			var line = new THREE.Geometry();
+			line.vertices.push(coreVertices[i]);
+			line.vertices.push(frameVertices[i]);
+			lines[i] = new THREE.Line(line, lineMaterial);
+			scene.add(lines[i]);
 		}
 
+		createWindows();
 		createSlabs();
 	}
 
 	window.updateBuilding = function updateBuilding()
 	{
 		
+		//clear scene
+		for (var i = 0; i < scene.children.length; i++)
+		{
+			var obj = scene.children[ i ];
+			scene.remove(obj)
+		}
+
 		// floor vertices
 		coreVertices[0].set(-controls.Length * .5,	0, controls.Width * .5 );
 		coreVertices[1].set(controls.Length * .5, 	0, controls.Width * .5 );
@@ -173,16 +186,10 @@ $(function () {
 		coreVertices[3].set(-controls.Length * .5,	0, -controls.Width * .5 );
 
 		// ceiling vertices
-		coreVertices[4].set(-controls.Length * .5,	controls.Height,  controls.Width * .5 );
-		coreVertices[5].set(controls.Length * .5, 	controls.Height,  controls.Width * .5 );
-		coreVertices[6].set(controls.Length * .5, 	controls.Height,  -controls.Width * .5 );
-		coreVertices[7].set(-controls.Length * .5,	controls.Height,  -controls.Width * .5 );
-
-		// multplier for building frame offset
-		var mult = controls.Offset * 2;
-		var offsetLength = controls.Length + mult;
-		var offsetWidth = controls.Width + mult;
-		var offsetHeight = controls.Height;
+		coreVertices[4].set(-controls.Length * .5,	controls.Height * controls.FloorCount,  controls.Width * .5 );
+		coreVertices[5].set(controls.Length * .5, 	controls.Height * controls.FloorCount,  controls.Width * .5 );
+		coreVertices[6].set(controls.Length * .5, 	controls.Height * controls.FloorCount,  -controls.Width * .5 );
+		coreVertices[7].set(-controls.Length * .5,	controls.Height * controls.FloorCount,  -controls.Width * .5 );
 
 		// offset floor vertices
 		frameVertices[0].set(-offsetLength * .5,	0, offsetWidth * .5 );
@@ -191,23 +198,13 @@ $(function () {
 		frameVertices[3].set(-offsetLength * .5,	0, -offsetWidth * .5 );
 
 		// offset ceiling vertices
-		frameVertices[4].set(-offsetLength * .5,	offsetHeight,  offsetWidth * .5 );
-		frameVertices[5].set(offsetLength * .5, 	offsetHeight,  offsetWidth * .5 );
-		frameVertices[6].set(offsetLength * .5, 	offsetHeight,  -offsetWidth * .5 );
-		frameVertices[7].set(-offsetLength * .5,	offsetHeight,  -offsetWidth * .5 );
-
-		console.log(coreVertices[0]);
-		console.log(frameVertices[0]);
+		frameVertices[4].set(-offsetLength * .5,	offsetHeight * controls.FloorCount,  offsetWidth * .5 );
+		frameVertices[5].set(offsetLength * .5, 	offsetHeight * controls.FloorCount,  offsetWidth * .5 );
+		frameVertices[6].set(offsetLength * .5, 	offsetHeight * controls.FloorCount,  -offsetWidth * .5 );
+		frameVertices[7].set(-offsetLength * .5,	offsetHeight * controls.FloorCount,  -offsetWidth * .5 );
 
 		coreGeom.vertices = coreVertices;
 		frameGeom.vertices = frameVertices;
-
-		//clear scene
-		for (var i = 0; i < scene.children.length; i++)
-		{
-			var obj = scene.children[ i ];
-			scene.remove(obj)
-		}
 
 		// create geometry frames
 		scene.add(coreHelper);
@@ -218,36 +215,91 @@ $(function () {
 		// draw lines between corner points
 		for (var i = 0; i < frame.geometry.vertices.length; i++)
 		{
-			var lines = new THREE.Geometry();
-			lines.vertices.push(coreVertices[i]);
-			lines.vertices.push(frameVertices[i]);
-			var line = new THREE.Line(lines, lineMaterial);
-			scene.add(line);
+			var line = new THREE.Geometry();
+			line.vertices.push(coreVertices[i]);
+			line.vertices.push(frameVertices[i]);
+			lines[i] = new THREE.Line(line, lineMaterial);
+			scene.add(lines[i]);
 		}
 
+		createWindows();
 		createSlabs();
 
+	}
+
+	function createWindows() {
+		if (controls.WindowArea > 0)
+		{
+			var windHeight = (controls.Height * (controls.WindowArea/100));
+
+			var windGeom = new THREE.Geometry();
+			var windVerts = [];
+
+			windows = [];
+
+			// floor vertices
+			windVerts[0] = new THREE.Vector3( -offsetLength * .5, 0, offsetWidth * .5 );
+			windVerts[1] = new THREE.Vector3( offsetLength * .5, 0, offsetWidth * .5 );
+			windVerts[2] = new THREE.Vector3( offsetLength * .5, 0, -offsetWidth * .5 );
+			windVerts[3] = new THREE.Vector3( -offsetLength * .5, 0, -offsetWidth * .5 );
+
+			// ceiling vertices
+			windVerts[4] = new THREE.Vector3( -offsetLength * .5, windHeight, offsetWidth * .5 );
+			windVerts[5] = new THREE.Vector3( offsetLength * .5, windHeight, offsetWidth * .5 );
+			windVerts[6] = new THREE.Vector3( offsetLength * .5, windHeight, -offsetWidth * .5 );
+			windVerts[7] = new THREE.Vector3( -offsetLength * .5,windHeight, -offsetWidth * .5 );
+
+			windGeom.vertices = windVerts;
+
+			// left
+			windGeom.faces[0] = new THREE.Face3( 7, 4, 0 );
+			windGeom.faces[1] = new THREE.Face3( 7, 0, 3 );
+			// front
+			windGeom.faces[2] = new THREE.Face3( 4, 5, 1 );
+			windGeom.faces[3] = new THREE.Face3( 4, 1, 0 );
+			// back
+			windGeom.faces[4] = new THREE.Face3( 6, 7, 3 );
+			windGeom.faces[5] = new THREE.Face3( 6, 3, 2 );
+			// right
+			windGeom.faces[6] = new THREE.Face3( 5, 6, 2 );
+			windGeom.faces[7] = new THREE.Face3( 5, 2, 1 );
+
+			//var wind = new THREE.Mesh( windGeom, boxMaterial );
+
+			for (var i = 0; i < controls.FloorCount; i++)
+			{
+				var wind = new THREE.Mesh( windGeom, boxMaterial );
+				wind.position.y += controls.Height/4;
+				wind.position.y += controls.Height * (i)
+				scene.add(wind);
+			}
+
+		}
 	}
 
 	function createSlabs() {
 		if (controls.FloorCount > 1)
 		{
 			var floorSpacing = controls.Height/controls.FloorCount;
+			var mult = controls.Offset * 2;
+			var offsetLength = controls.Length + mult;
+			var offsetWidth = controls.Width + mult;
+			var offsetHeight = controls.Height;
 
 			for (var i = 0; i < controls.FloorCount; i++ )
 			{
 				if( i != 0)
 				{
-					var slab = new THREE.PlaneGeometry( controls.Length, controls.Width, 2 );
+					var slab = new THREE.PlaneGeometry( offsetLength, offsetWidth, 2 );
 					var plane = new THREE.Mesh( slab, slabMaterial );
 					plane.rotation.x = 90 * Math.PI / 180;
-					plane.position.y += floorSpacing*i;
+					plane.position.y +=  controls.Height *i;
 					scene.add( plane );
 				}
 
 				else
 				{
-					var slab = new THREE.PlaneGeometry( controls.Length, controls.Width, 2 );
+					var slab = new THREE.PlaneGeometry( offsetLength, offsetWidth, 2 );
 					var plane = new THREE.Mesh( slab, slabMaterial );
 					plane.rotation.x = 90 * Math.PI / 180;
 					scene.add( plane );
