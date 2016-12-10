@@ -28,7 +28,7 @@ $(function () {
 	    this.Width = 25.35;
 	    this.Height = 5;
 	    this.Offset = 1.1;
-	    this.FloorCount = 10;
+	    this.FloorCount = 1;
 	    this.WindowArea = 50;
 	  };
 
@@ -278,13 +278,10 @@ $(function () {
 	}
 
 	function createSlabs() {
+		var floorSpacing = controls.Height/controls.FloorCount;
+
 		if (controls.FloorCount > 1)
 		{
-			var floorSpacing = controls.Height/controls.FloorCount;
-			var mult = controls.Offset * 2;
-			var offsetLength = controls.Length + mult;
-			var offsetWidth = controls.Width + mult;
-			var offsetHeight = controls.Height;
 
 			for (var i = 0; i < controls.FloorCount; i++ )
 			{
@@ -296,15 +293,15 @@ $(function () {
 					plane.position.y +=  controls.Height *i;
 					scene.add( plane );
 				}
-
-				else
-				{
-					var slab = new THREE.PlaneGeometry( offsetLength, offsetWidth, 2 );
-					var plane = new THREE.Mesh( slab, slabMaterial );
-					plane.rotation.x = 90 * Math.PI / 180;
-					scene.add( plane );
-				}
 			}
+		}
+
+		else
+		{
+			var slab = new THREE.PlaneGeometry( offsetLength, offsetWidth, 2 );
+			var plane = new THREE.Mesh( slab, slabMaterial );
+			plane.rotation.x = 90 * Math.PI / 180;
+			scene.add( plane );
 		}
 	}
 
