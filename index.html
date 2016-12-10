@@ -1,117 +1,241 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>Design Generator</title>
+
+<head>
+
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <style>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, shrink-to-fit=no, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-      body {
-        font-family: Monospace;
-        background-color: #f0f0f0;
-        margin: 0px;
-        overflow: hidden;
-        color: purple;
-      }
+    <title>Design Generator</title>
 
-      a {
-        color: red;
-      }
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
 
-      div#scale-maximum {
-        color: black;
-        text-align: center;
-        font-size: 1.2em;
-        position: fixed;
-        top: 60px;
-        left: 20px;
-        right: 0px;
-        width: 3%;
-      }
+    <!-- Custom CSS -->
+    <link href="css/simple-sidebar.css" rel="stylesheet">
 
-      div#scale {
-        position: fixed;
-        top: 80px;
-        left: 20px;
-        width: 35px;
-        height: 300px;
-        background-image: -webkit-gradient(
-          linear,
-          right bottom,
-          right top,
-          color-stop(0, #0000FF),
-          color-stop(1, #FF0000)
-        );
-        background-image: -o-linear-gradient(top, #0000FF 0%, #FF0000 100%);
-        background-image: -moz-linear-gradient(top, #0000FF 0%, #FF0000 100%);
-        background-image: -webkit-linear-gradient(top, #0000FF 0%, #FF0000 100%);
-        background-image: -ms-linear-gradient(top, #0000FF 0%, #FF0000 100%);
-        background-image: linear-gradient(to top, #0000FF 0%, #FF0000 100%);
-      }
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
 
-      div#scale-minimum {
-        position: fixed;
-        top: 390px;
-        left: 20px;
-        color: black;
-        text-align: center;
-        font-size: 1.2em;
-        width: 3%;
-      }
+</head>
 
-      div#cursor-temperature {
-        position: fixed;
-        top: 20px;
-        left: 100px;
-        color: black;
-        text-align: left;
-        font-size: 1.2em;
-        width: 30%;
-      }
+<body>
 
-      div#occupant-position {
-        position: fixed;
-        top: 40px;
-        left: 100px;
-        color: black;
-        text-align: left;
-        font-size: 1.2em;
-        width: 30%;
-      }
- 
-      div#generating {
-        position: absolute;
-        top: 0px;
-        left: 0px;
-        width: 100%;
-        height: 100%;
-        opacity: 0.7;
-        text-align: center;
-        padding-top: 20%;
-        background-color: #ddd; 
-      }
+    <div id="wrapper">
 
-    </style>
-  </head>
-  <body>
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <ul class="sidebar-nav">
+                <li class="sidebar-brand">
+                    <button type="button" class="btn btn-warning btn-l" id="generate"
+                        title="Generate combinations and visualize in Design Explorer">
+                        Generate!
+                    </button>
+                </li>
+                <div class="panel panel-default">
+		          <div class="panel-heading clickable" data-toggle="collapse" data-parent="#accordion" href="#bldginfo-wrapper">
+		            <h4 class="panel-title">Building Geometry</h4>
+		          </div>
+		          <div id="bldginfo-wrapper" class="panel-collapse collapse in">
+		            <div id="bldginfo-sliders" class="panel-body">
+                        <div class="col-xs-12" title="Change the area of the  building.">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" value=""> Area
+                            </label>
+                            <input type="text" id="nArea" name="nArea" value="1250">
+                        </div>
+                        <div class="col-xs-12" title="Change the area of the  building.">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" value=""> Width
+                            </label>
+                            <input type="text" id="nWidth" name="nWidth" value="100">
+                        </div>
+                        <div class="col-xs-12" title="Change the area of the  building.">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" value=""> Length
+                            </label>
+                            <input type="text" id="nLength" name="nLength" value="50">
+						</div>
+                        <div class="col-xs-12" title="Change the area of the  building.">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" value=""> Height
+                            </label>
+                            <input type="text" id="nHeight" name="nHeight" value="10">
+                        </div>
+                        <div class="col-xs-12" title="Change the area of the  building.">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" value=""> Offset
+                            </label>
+                            <input type="text" id="nOffset" name="nOffset" value="5">
+                        </div>
+                        <div class="col-xs-12" title="Change the area of the  building.">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" value=""> Floor Count
+                            </label>
+                            <input type="text" id="nFloorcount" name="nFloorcount" value="4">
+						</div>
+                        <a href="#">Aspect Ratio</a>
+                        <a href="#">Perimeter Depth (m)</a>
+                        <a href="#">Orientation</a>
+                        <a href="#">Floor to Floor height  (m)</a>
+		            </div>
+		          </div>
+                  <div class="panel-heading clickable" data-toggle="collapse" data-parent="#accordion" href="#windowinfo-wrapper">
+                    <h4 class="panel-title">Openings Parameters</h4>
+                  </div>
+                  <div id="windowinfo-wrapper" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <a href="#">Window Wall Ratio (%)</a>
+                        <a href="#">Window Height  (m)</a>
+                        <a href="#">Sill Height  (m)</a>
+                        <a href="#">Shading depth (m)</a>
+                    </div>
+                  </div>
+                  <div class="panel-heading clickable" data-toggle="collapse" data-parent="#accordion" href="#materialsinfo-wrapper">
+                    <h4 class="panel-title">Material Parameters</h4>
+                  </div>
+                  <div id="materialsinfo-wrapper" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <a href="#">Infiltration</a>
+                        <a href="#">Wall R-value (M/K/W)</a>
+                        <a href="#">Roof R-value (M/K/W)</a>
+                        <a href="#">Glazing Type</a>
+                    </div>
+                  </div>
+                  <div class="panel-heading clickable" data-toggle="collapse" data-parent="#accordion" href="#loadsinfo-wrapper">
+                    <h4 class="panel-title">Loads & Set-points</h4>
+                  </div>
+                  <div id="loadsinfo-wrapper" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <a href="#">Outside air (Core) [CFM/ft²]</a>
+                        <a href="#">Outside air (Perimeter)</a>
+                        <a href="#">Internal Load (Core)[W/ft²]</a>
+                        <a href="#">Internal Load (Perimeter)[W/ft²]</a>
+                        <a href="#">Comfort Range</a>
+                    </div>
+                  </div>
+                  <div class="panel-heading clickable" data-toggle="collapse" data-parent="#accordion" href="#systemsinfo-wrapper">
+                    <h4 class="panel-title">HVAC System</h4>
+                  </div>
+                  <div id="systemsinfo-wrapper" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <select class="form-control" id="sel1">
+                          <option>VAV + Reheat</option>
+                          <option>Chilled Beam</option>
+                          <option>VRF + DOAS</option>
+                          <option>Radiant + DOAS</option>
+                          <option>Heat Pump</option>
+                        </select>
+                    </div>
+                  </div>
+                </div>
 
-    <script type="text/javascript" src="js/libs/three.js/build/three.min.js"></script>
-    <script type="text/javascript" src="js/libs/three.js/src/extras/cameras/CombinedCamera.js"></script>
-    <script type="text/javascript" src="js/libs/three.js/examples/js/controls/OrbitControls.js"></script>
-    <script type="text/javascript" src="js/libs/three.js/examples/fonts/helvetiker_regular.typeface.js"></script>
-    <script type="text/javascript" src="js/libs/dat-gui/build/dat.gui.min.js"></script>
-    <script type="text/javascript" src="js/libs/underscore.min.js"></script>
-    <script type="text/javascript" src="js/util.js"></script>
-    
-    <div class="scale-label" id="scale-maximum"></div>
-    <div id="scale-container">
-      <div id="scale"></div>
+            </ul>
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <button type="button" class="btn btn-default btn-xs" id="menu-toggle" title="Show sliders">
+                            <span class="glyphicon glyphicon-menu-hamburger"></span>
+                        </button>
+                    </div>
+                    <div class="col-lg-12" id="viewer3d">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /#page-content-wrapper -->
+
     </div>
-    <div class="scale-label" id="scale-minimum"></div>
-    <div class="scale-label" id="occupant-position"></div>
-    <div class="scale-label" id="cursor-temperature"></div>
-    <div id="generating" style="display: none;">generating ... </div>
+    <!-- /#wrapper -->
+    <script src="js/libs/d3/d3.v3.min.js" charset="utf-8"></script> <!-- D3 -->
 
-    <script type="text/javascript" src="js/main.js"></script>
-  </body>
+    <!-- jQuery -->
+    <script src="js/libs/jquery.js"></script>
+
+    <script src="js/libs/three.js/build/three.js" charset="utf-8"></script> <!-- D3 -->
+    <script src="js/libs/three.js/examples/js/controls/OrbitControls.js" charset="utf-8"></script> <!-- D3 -->
+    <script src="js/libs/three.js/examples/js/libs/dat.gui.min.js" charset="utf-8"></script> <!-- D3 -->
+
+
+    <script src="js/main.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/libs/bootstrap.min.js"></script>
+
+    <script src="js/libs/rangeslider/js/ion.rangeSlider.js"></script>
+    <link rel="stylesheet" href="js/libs/rangeslider/css/normalize.css" />
+    <link rel="stylesheet" href="js/libs/rangeslider/css/ion.rangeSlider.css" />
+    <link rel="stylesheet" href="js/libs/rangeslider/css/ion.rangeSlider.skinNice.css"/>
+    <script>
+        var sliders = [
+            {"divid": "bldginfo-sliders", "name": "Area", "min": 1250, "max": 5000, "from": 1250, "step": 3750, "postfix": " m2"},
+            {"divid": "bldginfo-sliders", "name": "Width", "min": 0, "max": 200, "from": 1250, "step": 50, "postfix": " m"},
+            {"divid": "bldginfo-sliders", "name": "Height", "min": 0, "max": 200, "from": 1250, "step": 10, "postfix": " m"},
+            {"divid": "bldginfo-sliders", "name": "Length", "min": 0, "max": 200, "from": 1250, "step": 10, "postfix": " m"},
+            {"divid": "bldginfo-sliders", "name": "Offset", "min": 1, "max": 3, "from": 2, "step": 1, "postfix": " m"},
+            {"divid": "bldginfo-sliders", "name": "Floorcount", "min": 0, "max": 4, "from": 2, "step": 1, "postfix": " m"}
+
+        ]
+
+        // generate sliders
+
+        // <div class="col-xs-12" title="Change the area of the  building.">
+        //     <label class="checkbox-inline">
+        //         <input type="checkbox" value=""> Area
+        //     </label>
+        //     <input type="text" id="nArea" name="nArea" value="1250">
+        // </div>
+        //
+        // update slider values
+        for(count = 0; count < sliders.length; count++){
+            var sl = sliders[count]
+            d3.select("#" + sl.name)
+
+            $("#n" + sl.name).ionRangeSlider({
+                hide_min_max: true, min: sl.min, max: sl.max, from: sl.from, step: sl.step,
+                postfix:sl.postfix, grid: false, prettify_separator: ",",
+                onFinish: function(data) {update(data.input[0].name, data.from);}
+            });
+        }
+
+        function updateSliderValue(sliderName, sliderValue){
+            $("#" + sliderName).data("ionRangeSlider").update({ from: sliderValue});
+        }
+    </script>
+
+    <script>
+        function update(name, value){
+            console.log('updating!');
+            // update slider value
+            controls[name.slice(1)] = value
+            // update geometry
+            updateBuilding()
+            // update d3 graph
+
+            // parse the results
+        }
+    </script>
+
+    <!-- Menu Toggle Script -->
+    <script>
+    $("#menu-toggle").click(function(e) {
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
+    });
+    </script>
+
+</body>
+
 </html>
