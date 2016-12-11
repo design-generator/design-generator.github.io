@@ -1,0 +1,201 @@
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>test</title>
+
+<!-- load javascript libraries -->
+<!-- <script src="https://d3js.org/d3.v4.min.js"></script> -->
+<script src="d3.min.js"></script>
+<!-- <script type="text/javascript" src="jsonGenerator.js"></script> -->
+
+<style>
+
+ .total-eui-label {
+   font-family: times, Times New Roman, times-roman, georgia, serif;
+   color: #444;
+   margin: 0;
+   padding: 0px 0px 0px 0px;
+   font-size: 35px;
+   letter-spacing: -2px;
+   text-align: center;
+   vertical-align: middle;
+   font-weight: bold;
+ }
+ .eui-label {
+   font-family: times, Times New Roman, times-roman, georgia, serif;
+   color: #444;
+   margin: 0;
+   padding: 0px 0px 4px 0px;
+   font-size: 24px;
+   line-height: 12px;
+   letter-spacing: -2px;
+   text-align: center;
+   vertical-align: middle;
+   font-weight: bold;
+ }
+</style>
+
+</head>
+<body>
+<div id="euiDonut"></div>
+<div id="2Dplan"></div>
+
+<script>
+
+  // define svg size
+  var margin = {top: 20, right: 20, bottom: 20, left: 20},
+    width = 220 - margin.left - margin.right,
+    height = 220 - margin.top - margin.bottom,
+    cx = width/2,
+    cy = height/2,
+    radius = Math.min(cx,cy);
+  
+  //extend the color functions
+  var eui_donut_color = d3.scale.ordinal()
+    .domain(["heating","cooling","lighting"])
+    .range(["#d7191c", "#2b83ba", "#fdae61", "#abdda4"]);
+
+  var eui_donut_svg = d3.select("#euiDonut").append("svg")
+	  .attr("width", width + margin.left + margin.right)
+	  .attr("height", height + margin.top + margin.bottom)
+	.append("g")
+	  .attr("transform", "translate(" + (cx + margin.left) + "," + (cy + margin.top) +")");
+	
+  var arc = d3.svg.arc()
+	.outerRadius(radius - 10)
+	.innerRadius(radius - 50);
+
+function updateEuiDonut(data) {
+
+  eui_donut_svg.selectAll("*").remove()
+  
+  //total eui
+  var total_eui = d3.nest()
+	.rollup(function(d){
+	  return d3.sum(d, function(g) {return g.value; });
+	})
+	.entries(data);
+  
+  eui_donut_svg.append("text")
+	.attr("class","total-eui-label")
+	.text(total_eui)
+	.attr("text-anchor","middle")
+	.attr("y",10)
+
+  var pie = d3.layout.pie()
+	.sort(null)
+	.value(function(d) { return d.value; });
+
+  var g = eui_donut_svg.selectAll(".arc")
+	.data(pie(data))
+
+  g.enter().append("g")
+	.attr("class", "arc")
+	.on("mouseover", function(d) {
+	  d3.select(this).append("text")
+		.text(d.value)
+		.attr("class","eui-label")
+		.attr("text-anchor","middle")
+		.attr("x",(radius)*Math.cos( ((d.endAngle + d.startAngle)/2) - (Math.PI/2) ))
+		.attr("y",(radius)*Math.sin( ((d.endAngle + d.startAngle)/2) - (Math.PI/2) ) + 5)
+	})
+	.on("mouseout", function(d) {
+	  d3.select(this).selectAll("text").remove();
+	})
+    .append("path")
+	.attr("d", arc)
+	.style("fill", function(d) { return eui_donut_color(d.data.name); });
+	
+	//exit out old elements
+	g.exit().remove();
+};
+
+data = [{"name":"heating","value":95.0},{"name":"cooling","value":7},{"name":"lighting","value":3.7},{"name":"equipment","value":4}];
+params = {}
+params.data = data;
+updateEuiDonut(params.data);
+
+data = [{"name":"heating","value":20.0},{"name":"cooling","value":7},{"name":"lighting","value":3.7},{"name":"equipment","value":4}];
+updateEuiDonut(data);
+</script>
+
+
+<script>
+/*
+Takes in parameters of basic geometry and generates json file for 
+*/
+
+//console.log("this runs...");
+
+class Point3D {
+  constructor(x, y, z) {
+    this.x = x;
+    this.y = y;
+	this.z = z;
+  }
+}
+Point3D.prototype.add = function(vector3D) {
+  p2 = this;
+  p2.x = p2.x + vector3D.x;
+  p2.y = p2.y + vector3D.y;
+  p2.z = p2.z + vector3D.z;
+  return p2;
+}
+class Vector3D {
+  constructor(x, y, z) {
+    this.x = x;
+    this.y = y;
+	this.z = z;
+  }
+}
+//Faces are composed of three vertices (points)
+class Face {
+  constructor(p1,p2,p3){
+    this.p1 = p1;
+	this.p2 = p2;
+	this.p3 = p3;
+  }  
+}
+Face.prototype.getArea = function() {
+    return 'area calc here';
+}
+
+//test code
+var p1 = new Point3D(4,5,3);
+//console.log(p1);
+var v1 = new Vector3D(3,4,5);
+//console.log(v1);
+var p2 = p1.add(v1);
+//console.log(p2);
+
+function basicRectangle(params) {
+
+  var length = params.length,
+	  width = params.width,
+	  height = params.height,
+	  perimeter_zone_depth = params.perimeter_zone_depth,
+	  orientation = params.orientation,
+      shortest_side = d3.min(length,width);
+
+  //validity checks
+  if (shortest_side < 1e-4) {	
+	console.log("ERROR: shortest side less than zero")
+	return false;
+  };
+  if (height < 1e-4) {	
+	console.log("ERROR: length less than zero")
+	return false;
+  };
+  if ( (shortest_side < 1e-4) || (2*perimeter_zone_depth >= (shortest_side - 1e-4)) ){
+	console.log("ERROR: perimeter zone depth is greater than twice the shortest dimension")
+	return false;	  
+  };
+
+  //create faces
+  
+}
+
+//code to convert faces (with vertices) to json
+</script>
+</body>
