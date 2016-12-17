@@ -2,30 +2,123 @@
 $(function () {
 	var camera, scene, renderer;
 	var control;
+	var container;
+	var building;
 
-	// materials
-	var boxMaterial;
-	var lineMaterial;
-	var slabMaterial
-	var frameColor = 0x000000;
-
-	// inner core
-	var core;
-	var coreHelper = new THREE.BoxHelper(core, frameColor);
-	var coreVertices = [];
-
-	// outer frame
-	var frame;
-	var frameHelper = new THREE.BoxHelper(frame, frameColor);
-	var frameVertices = [];
-
-	var lines = [];
+	var floors = [];
+	var helpers = [];
 	var windows = [];
 
-	var mult = controls.Offset * 2;
-	var offsetLength = controls.Length + mult;
-	var offsetWidth = controls.Width + mult;
-	var offsetHeight = controls.Height;
+	class Building {
+		constructor(area, aspectRatio, height, floorCount, windowRatio)
+		{
+			this.length = Math.sqrt(area)/aspectRatio;
+			this.width = area/this.length;
+			this.height = height;
+			this.floorCount = floorCount;
+			this.windowRatio = windowRatio;
+		}
+
+		createFloor()
+		{
+			// Floor Materials
+			var material = new THREE.MeshBasicMaterial( { color: 0xd3d3d3, side: THREE.DoubleSide } );
+
+			var plane = new THREE.PlaneGeometry( this.length, this.width, 2 );
+
+			var floor = new THREE.Mesh( plane, material );
+			floor.rotation.x = 90 * Math.PI / 180;
+			var floorsContainer = [];
+			floorsContainer.push(floor);
+
+    		for(var i = 1; i < this.floorCount ; i++)
+    		{
+    			var newFloor = floor.clone();
+    			newFloor.position.y += this.height * i;
+    			floorsContainer.push(newFloor);
+    		}
+
+    		return floorsContainer;
+		}
+
+		createHelper(inset)
+		{
+
+			var material = new THREE.MeshBasicMaterial( { color: 0xff0000, transparent: false, opacity: 0.5 } );
+			var box = new THREE.BoxGeometry( this.length, this.height * this.floorCount, this.width);
+			var boxOffset = new THREE.BoxGeometry( this.length-inset, this.height * this.floorCount, this.width-inset);
+			var meshBox = new THREE.Mesh(box, material);
+			var offsetMeshBox = new THREE.Mesh(boxOffset, material);
+			meshBox.position.y= offsetMeshBox.position.y += this.height * this.floorCount / 2;
+			var boxHelper = new THREE.BoxHelper(meshBox, 0x000000);
+			var offsetBoxHelper = new THREE.BoxHelper(offsetMeshBox, 0x000000);
+			var helpersContainer = [];
+			helpersContainer.push(boxHelper);
+			helpersContainer.push(offsetBoxHelper);
+
+			var lines = [];
+
+			var lineMaterial = new THREE.LineBasicMaterial(
+			{
+            	color: 0x000000
+	        });
+
+			// Draw lines between corner points
+			for (var i = 0; i < offsetMeshBox.geometry.vertices.length; i++)
+			{
+				var line = new THREE.Geometry();
+				line.vertices.push(meshBox.geometry.vertices[i]);
+				line.vertices.push(offsetMeshBox.geometry.vertices[i]);
+				lines[i] = new THREE.Line(line, lineMaterial);
+				lines[i].position.y += this.height * this.floorCount / 2;
+				helpersContainer.push(lines[i]);
+			}
+
+			return helpersContainer;
+		}
+
+		createWindows(percent)
+		{
+			var materials = [
+			    //Invisible
+			    new THREE.MeshBasicMaterial( { transparent: true, opacity: 0.0 } ),
+			    //Blue
+			    new THREE.MeshBasicMaterial( { color: 0x0000ff, side: THREE.DoubleSide } ),
+			    ];
+
+			var glazing = new THREE.BoxGeometry( this.length, this.height * percent/100, this.width);
+
+			for( var i = 0; i < glazing.faces.length; i++ ) 
+			   {
+    				if (i < 4 || i > 7)
+    				{
+    					glazing.faces[ i ].materialIndex = 1;
+    				}
+
+    				else
+    				{
+    					glazing.faces[ i ].materialIndex = 0;
+    				}
+    			}
+
+			// Floor Materials
+			var glazingMesh = new THREE.Mesh(glazing, new THREE.MultiMaterial( materials ));
+			glazingMesh.position.y += this.height/2;
+			var windowsContainer = [];
+			windowsContainer.push(glazingMesh);;
+
+			for(var i = 1; i < this.floorCount ; i++)
+    		{
+    			var newGlazingMesh = glazingMesh.clone();
+    			newGlazingMesh.position.y += this.height * i;
+    			windowsContainer.push(newGlazingMesh);
+    		}
+
+    		return windowsContainer;
+		}
+	}
+
+	// materials
 
 	init();
 	animate();
@@ -38,34 +131,20 @@ $(function () {
 		scene = new THREE.Scene();
 		scene.background = new THREE.Color( 0xffffff );
 
-		// define materials
-		boxMaterial = new THREE.MeshBasicMaterial( {
-			color: 0x0000ff,
-			side: THREE.DoubleSide,
-			transparent: true,
-			opacity: .3
-		} );
-
-		lineMaterial = new THREE.LineBasicMaterial({
-            color: frameColor
-        });
-
-        slabMaterial = new THREE.MeshBasicMaterial( {
-        	color: 0xff0000,
-        	side: THREE.DoubleSide
-        } );
-
-        createBuilding();
+		building = new Building(controls.Area, controls.Aspect_Ratio, controls.Height, controls.FloorCount);
+        floors = building.createFloor();
+        helpers = building.createHelper(controls.Offset);
+        windows = building.createWindows(controls.Window_Wall_Ratio);
+        
+        addObjects();
 
       	// define renderer
 		renderer = new THREE.WebGLRenderer();
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( window.innerWidth, window.innerHeight );
-
 		container = document.getElementById("viewer3d")
-		var texture = new THREE.Texture(container);
-		texture.needsUpdate = true;
 		container.appendChild( renderer.domElement );
+
 
 		window.addEventListener( 'resize', onWindowResize, false );
 
@@ -73,235 +152,61 @@ $(function () {
 		control = new THREE.OrbitControls( camera, container );
 	}
 
-	function createBuilding() {
-		coreGeom = new THREE.Geometry();
-		frameGeom = new THREE.Geometry();
-
-		// floor vertices
-		coreVertices[0] = new THREE.Vector3( -controls.Length * .5,	0, controls.Width * .5 );
-		coreVertices[1] = new THREE.Vector3( controls.Length * .5, 	0, controls.Width * .5 );
-		coreVertices[2] = new THREE.Vector3( controls.Length * .5, 	0, -controls.Width * .5 );
-		coreVertices[3] = new THREE.Vector3( -controls.Length * .5,	0, -controls.Width * .5 );
-
-		// ceiling vertices
-		coreVertices[4] = new THREE.Vector3( -controls.Length * .5,	controls.Height * controls.FloorCount,  controls.Width * .5 );
-		coreVertices[5] = new THREE.Vector3( controls.Length * .5, 	controls.Height * controls.FloorCount,  controls.Width * .5 );
-		coreVertices[6] = new THREE.Vector3( controls.Length * .5, 	controls.Height * controls.FloorCount,  -controls.Width * .5 );
-		coreVertices[7] = new THREE.Vector3( -controls.Length * .5,	controls.Height * controls.FloorCount,  -controls.Width * .5 );
-
-		// offset floor vertices
-		frameVertices[0] = new THREE.Vector3( -offsetLength * .5,	0, offsetWidth * .5 );
-		frameVertices[1] = new THREE.Vector3( offsetLength * .5, 	0, offsetWidth * .5 );
-		frameVertices[2] = new THREE.Vector3( offsetLength * .5, 	0, -offsetWidth * .5 );
-		frameVertices[3] = new THREE.Vector3( -offsetLength * .5,	0, -offsetWidth * .5 );
-
-		// offset ceiling vertices
-		frameVertices[4] = new THREE.Vector3( -offsetLength * .5,	offsetHeight * controls.FloorCount,  offsetWidth * .5 );
-		frameVertices[5] = new THREE.Vector3( offsetLength * .5, 	offsetHeight * controls.FloorCount,  offsetWidth * .5 );
-		frameVertices[6] = new THREE.Vector3( offsetLength * .5, 	offsetHeight * controls.FloorCount,  -offsetWidth * .5 );
-		frameVertices[7] = new THREE.Vector3( -offsetLength * .5,	offsetHeight * controls.FloorCount,  -offsetWidth * .5 );
-
-		coreGeom.vertices = coreVertices;
-		frameGeom.vertices = frameVertices;
-
-		// bottom
-		coreGeom.faces[0] = new THREE.Face3( 0, 1, 2 );
-		coreGeom.faces[1] = new THREE.Face3( 0, 2, 3 );
-		frameGeom.faces[0] = new THREE.Face3( 0, 1, 2 );
-		frameGeom.faces[1] = new THREE.Face3( 0, 2, 3 );
-		// left
-		coreGeom.faces[2] = new THREE.Face3( 7, 4, 0 );
-		coreGeom.faces[3] = new THREE.Face3( 7, 0, 3 );
-		frameGeom.faces[2] = new THREE.Face3( 7, 4, 0 );
-		frameGeom.faces[3] = new THREE.Face3( 7, 0, 3 );
-		// front
-		coreGeom.faces[4] = new THREE.Face3( 4, 5, 1 );
-		coreGeom.faces[5] = new THREE.Face3( 4, 1, 0 );
-		frameGeom.faces[4] = new THREE.Face3( 4, 5, 1 );
-		frameGeom.faces[5] = new THREE.Face3( 4, 1, 0 );
-		// back
-		coreGeom.faces[6] = new THREE.Face3( 6, 7, 3 );
-		coreGeom.faces[7] = new THREE.Face3( 6, 3, 2 );
-		frameGeom.faces[6] = new THREE.Face3( 6, 7, 3 );
-		frameGeom.faces[7] = new THREE.Face3( 6, 3, 2 );
-		// right
-		coreGeom.faces[8] = new THREE.Face3( 5, 6, 2 );
-		coreGeom.faces[9] = new THREE.Face3( 5, 2, 1 );
-		frameGeom.faces[8] = new THREE.Face3( 5, 6, 2 );
-		frameGeom.faces[9] = new THREE.Face3( 5, 2, 1 );
-		// top
-		coreGeom.faces[10] = new THREE.Face3( 7, 6, 5 );
-		coreGeom.faces[11] = new THREE.Face3( 7, 5, 4 );
-		frameGeom.faces[10] = new THREE.Face3( 7, 6, 5 );
-		frameGeom.faces[11] = new THREE.Face3( 7, 5, 4 );
-
-		core = new THREE.Mesh( coreGeom, boxMaterial );
-		frame = new THREE.Mesh ( frameGeom, boxMaterial);
-
-		// create geometry frames
-		scene.add(coreHelper);
-		scene.add(frameHelper);
-		coreHelper.update(core);
-		frameHelper.update(frame);
-
-		// draw lines between corner points
-		for (var i = 0; i < frame.geometry.vertices.length; i++)
-		{
-			var line = new THREE.Geometry();
-			line.vertices.push(coreVertices[i]);
-			line.vertices.push(frameVertices[i]);
-			lines[i] = new THREE.Line(line, lineMaterial);
-			scene.add(lines[i]);
-		}
-
-		createWindows(controls);
-		createSlabs(controls);
-	}
-
 	window.updateBuilding = function updateBuilding(cnrt)
 	{
 
-		//clear scene
-		for (var i = 0; i < scene.children.length; i++)
-		{
-			var obj = scene.children[ i ];
-			scene.remove(obj)
-		}
+        building.length = Math.sqrt(cnrt.Area)/(cnrt.Aspect_Ratio);
+	    building.width = cnrt.Area/building.length;
+		building.height = cnrt.Height;
+		building.floorCount = cnrt.FloorCount;
+		building.windowRatio = cnrt.Window_Wall_Ratio;
 
-		// floor vertices
-		coreVertices[0].set(-cnrt.Length * .5,	0, cnrt.Width * .5 );
-		coreVertices[1].set(cnrt.Length * .5, 	0, cnrt.Width * .5 );
-		coreVertices[2].set(cnrt.Length * .5, 	0, -cnrt.Width * .5 );
-		coreVertices[3].set(-cnrt.Length * .5,	0, -cnrt.Width * .5 );
+        removeObjects();
 
-		// ceiling vertices
-		coreVertices[4].set(-cnrt.Length * .5,	cnrt.Height * cnrt.FloorCount,  cnrt.Width * .5 );
-		coreVertices[5].set(cnrt.Length * .5, 	cnrt.Height * cnrt.FloorCount,  cnrt.Width * .5 );
-		coreVertices[6].set(cnrt.Length * .5, 	cnrt.Height * cnrt.FloorCount,  -cnrt.Width * .5 );
-		coreVertices[7].set(-cnrt.Length * .5,	cnrt.Height * cnrt.FloorCount,  -cnrt.Width * .5 );
+        floors = building.createFloor();
+        helpers = building.createHelper(cnrt.Offset);
+        windows = building.createWindows(cnrt.Window_Wall_Ratio);
 
-		// offset floor vertices
-		frameVertices[0].set(-offsetLength * .5,	0, offsetWidth * .5 );
-		frameVertices[1].set(offsetLength * .5, 	0, offsetWidth * .5 );
-		frameVertices[2].set(offsetLength * .5, 	0, -offsetWidth * .5 );
-		frameVertices[3].set(-offsetLength * .5,	0, -offsetWidth * .5 );
-
-		// offset ceiling vertices
-		frameVertices[4].set(-offsetLength * .5,	offsetHeight * cnrt.FloorCount,  offsetWidth * .5 );
-		frameVertices[5].set(offsetLength * .5, 	offsetHeight * cnrt.FloorCount,  offsetWidth * .5 );
-		frameVertices[6].set(offsetLength * .5, 	offsetHeight * cnrt.FloorCount,  -offsetWidth * .5 );
-		frameVertices[7].set(-offsetLength * .5,	offsetHeight * cnrt.FloorCount,  -offsetWidth * .5 );
-
-		coreGeom.vertices = coreVertices;
-		frameGeom.vertices = frameVertices;
-
-		// create geometry frames
-		scene.add(coreHelper);
-		scene.add(frameHelper);
-		coreHelper.update(core);
-		frameHelper.update(frame);
-
-		// draw lines between corner points
-		for (var i = 0; i < frame.geometry.vertices.length; i++)
-		{
-			var line = new THREE.Geometry();
-			line.vertices.push(coreVertices[i]);
-			line.vertices.push(frameVertices[i]);
-			lines[i] = new THREE.Line(line, lineMaterial);
-			scene.add(lines[i]);
-		}
-
-		createWindows(cnrt);
-		createSlabs(cnrt);
+        addObjects();
 
 	}
 
-	function createWindows(cnrt) {
-		if (cnrt.Window_Wall_Ratio > 0)
-		{
-			var windHeight = (cnrt.Height * (cnrt.Window_Wall_Ratio/100));
+	function removeObjects()
+	{
+		for(var i = 0; i < windows.length; i ++)
+        {
+        	scene.remove(floors[i]);
+        	scene.remove(windows[i]);
+        }
 
-			var windGeom = new THREE.Geometry();
-			var windVerts = [];
-
-			windows = [];
-
-			// floor vertices
-			windVerts[0] = new THREE.Vector3( -offsetLength * .5, 0, offsetWidth * .5 );
-			windVerts[1] = new THREE.Vector3( offsetLength * .5, 0, offsetWidth * .5 );
-			windVerts[2] = new THREE.Vector3( offsetLength * .5, 0, -offsetWidth * .5 );
-			windVerts[3] = new THREE.Vector3( -offsetLength * .5, 0, -offsetWidth * .5 );
-
-			// ceiling vertices
-			windVerts[4] = new THREE.Vector3( -offsetLength * .5, windHeight, offsetWidth * .5 );
-			windVerts[5] = new THREE.Vector3( offsetLength * .5, windHeight, offsetWidth * .5 );
-			windVerts[6] = new THREE.Vector3( offsetLength * .5, windHeight, -offsetWidth * .5 );
-			windVerts[7] = new THREE.Vector3( -offsetLength * .5,windHeight, -offsetWidth * .5 );
-
-			windGeom.vertices = windVerts;
-
-			// left
-			windGeom.faces[0] = new THREE.Face3( 7, 4, 0 );
-			windGeom.faces[1] = new THREE.Face3( 7, 0, 3 );
-			// front
-			windGeom.faces[2] = new THREE.Face3( 4, 5, 1 );
-			windGeom.faces[3] = new THREE.Face3( 4, 1, 0 );
-			// back
-			windGeom.faces[4] = new THREE.Face3( 6, 7, 3 );
-			windGeom.faces[5] = new THREE.Face3( 6, 3, 2 );
-			// right
-			windGeom.faces[6] = new THREE.Face3( 5, 6, 2 );
-			windGeom.faces[7] = new THREE.Face3( 5, 2, 1 );
-
-			//var wind = new THREE.Mesh( windGeom, boxMaterial );
-
-			for (var i = 0; i < cnrt.FloorCount; i++)
-			{
-				var wind = new THREE.Mesh( windGeom, boxMaterial );
-				wind.position.y += cnrt.Height/4;
-				wind.position.y += cnrt.Height * (i)
-				scene.add(wind);
-			}
-
-		}
+        for(var i = 0; i < helpers.length; i ++)
+        {
+        	scene.remove(helpers[i]);
+        }
 	}
 
-	function createSlabs(cnrt) {
-		var floorSpacing = cnrt.Height/cnrt.FloorCount;
+	function addObjects()
+	{
+		for(var i = 0; i < windows.length; i ++)
+        {
+        	scene.add(floors[i]);
+        	scene.add(windows[i]);
+        }
 
-		if (cnrt.FloorCount > 1)
-		{
-
-			for (var i = 0; i < cnrt.FloorCount; i++ )
-			{
-				if( i != 0)
-				{
-					var slab = new THREE.PlaneGeometry( offsetLength, offsetWidth, 2 );
-					var plane = new THREE.Mesh( slab, slabMaterial );
-					plane.rotation.x = 90 * Math.PI / 180;
-					plane.position.y +=  cnrt.Height *i;
-					scene.add( plane );
-				}
-			}
-		}
-
-		else
-		{
-			var slab = new THREE.PlaneGeometry( offsetLength, offsetWidth, 2 );
-			var plane = new THREE.Mesh( slab, slabMaterial );
-			plane.rotation.x = 90 * Math.PI / 180;
-			scene.add( plane );
-		}
+        for(var i = 0; i < helpers.length; i ++)
+        {
+        	scene.add(helpers[i]);
+        }
 	}
 
 	function animate() {
 		requestAnimationFrame( animate );
 		render();
+		control.update();
 	}
 
 	function render() {
 
-		// updateBuilding();
 		renderer.render( scene, camera );
 	}
 
@@ -311,8 +216,4 @@ $(function () {
 		renderer.setSize( window.innerWidth, window.innerHeight );
 	}
 
-	window.save = function save(){
-		window.open(renderer.domElement.toDataURL('img/png'), 'mywindow');
-		return false;
-	}
 });

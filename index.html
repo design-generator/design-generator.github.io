@@ -196,12 +196,12 @@ function export2DE(){
     <script>
     // constructor for settings
     	var Settings = function() {
-    	    this.Length = 25.35;
-    	    this.Width = 25.35;
-    	    this.Height = 5;
-    	    this.Offset = 1.1;
-    	    this.FloorCount = 1;
-    	    this.Window_Wall_Ratio = 30;
+    	    this.Area = 642.6225;
+            this.Aspect_Ratio = 1;
+            this.Height = 10;
+            this.Offset = 3;
+            this.FloorCount = 1;
+            this.Window_Wall_Ratio = 30;
     	  };
 
     	var controls = new Settings();
@@ -290,23 +290,10 @@ function export2DE(){
     <script>
         function update(name, value){
             // update slider value
-            // this part of the code should move to main.js
-            inputValues[name] = value;
-
-            if (name == 'nArea' || name == 'nAspect_Ratio'){
-                width = Math.sqrt(controls['Area'] / controls['Aspect_Ratio']);
-
-                controls['Width'] = width;
-                controls['Length'] = controls['Area'] / width;
-
-            }
-            controls[name.slice(1)] = value
+            controls[name.slice(1)] = value;
             // update geometry
-            // this is here because we couldn't figure out how to sync this between the two
-            // programs.
-            for (i=0; i < 20; i++){
-                updateBuilding(controls);
-            }
+            updateBuilding(controls);
+
             // parse the results
             var res = {
                 "Heating": Math.floor(Math.random() * 10000),
