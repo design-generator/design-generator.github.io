@@ -145,6 +145,7 @@ $(function () {
 		container = document.getElementById("viewer3d")
 		container.appendChild( renderer.domElement );
 
+		THREEx.Screenshot.bindKey(renderer);
 		window.addEventListener( 'resize', onWindowResize, false );
 
 		// add mouse controls
@@ -200,7 +201,6 @@ $(function () {
 
 	function animate() {
 		requestAnimationFrame( animate );
-		THREEx.Screenshot.bindKey(renderer);
 		render();
 		control.update();
 	}
