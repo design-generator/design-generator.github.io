@@ -139,12 +139,13 @@ $(function () {
         addObjects();
 
       	// define renderer
-		renderer = new THREE.WebGLRenderer();
+		renderer = new THREE.WebGLRenderer( { preserveDrawingBuffer: true });
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( window.innerWidth, window.innerHeight );
 		container = document.getElementById("viewer3d")
 		container.appendChild( renderer.domElement );
 
+		var dataUrl = renderer.domElement.toDataURL("image/png");
 
 		window.addEventListener( 'resize', onWindowResize, false );
 
@@ -201,6 +202,7 @@ $(function () {
 
 	function animate() {
 		requestAnimationFrame( animate );
+		THREEx.Screenshot.bindKey(renderer);
 		render();
 		control.update();
 	}
