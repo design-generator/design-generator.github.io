@@ -145,8 +145,6 @@ $(function () {
 		container = document.getElementById("viewer3d")
 		container.appendChild( renderer.domElement );
 
-		var dataUrl = renderer.domElement.toDataURL("image/png");
-
 		window.addEventListener( 'resize', onWindowResize, false );
 
 		// add mouse controls
